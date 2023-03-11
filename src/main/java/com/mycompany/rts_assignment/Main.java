@@ -25,5 +25,6 @@ public class Main {
         es.scheduleAtFixedRate(new Altitude(altList,phase), 0, SystemPhase.getSpeed(), TimeUnit.MILLISECONDS);
         es.scheduleAtFixedRate(new PlaneController(altList,wingsCommand), 0, SystemPhase.getSpeed(), TimeUnit.MILLISECONDS);
         es.scheduleAtFixedRate(new WingsFlap(wingsCommand,phase), 0, SystemPhase.getSpeed(), TimeUnit.MILLISECONDS);
+        //test
     }
 }
