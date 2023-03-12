@@ -5,9 +5,15 @@
 
 package com.mycompany.rts_assignment;
 
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -15,19 +21,18 @@ import java.util.Random;
  */
 public class Altitude implements Runnable{
     SystemPhase phase;
-    List<Integer> altitudeList =new ArrayList<Integer>();
+    String queueName = "altitude";
     
     int altitude = SystemPhase.idealAltitude;
 
-    public Altitude(List<Integer> list, SystemPhase sp){
-        this.altitudeList = list;
+    public Altitude(SystemPhase sp){
         this.phase = sp;
     }
     
     public void changeInAltitude() {
         altitude += phase.giveRandom();
 
-        altitudeList.add(altitude);
+        sendAltitudeValue(altitude);
     }
 
     @Override
@@ -35,4 +40,25 @@ public class Altitude implements Runnable{
         changeInAltitude();
     }
 
+    public void sendAltitudeValue(int alt){
+       try {          
+            ConnectionFactory cf = new ConnectionFactory();
+            Connection con = cf.newConnection();
+            Channel chan = con.createChannel();
+            
+            //convert message
+            String msg = Integer.toString(alt);
+            chan.queueDeclare(queueName,false,false,false,null);
+
+            //publish the message to the exchange using the routing key
+            chan.basicPublish("", queueName, null, msg.getBytes());
+            chan.close();
+            con.close();
+        } catch (IOException | TimeoutException ex) {
+            Logger.getLogger(Altitude.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+        
 }
+    
+
