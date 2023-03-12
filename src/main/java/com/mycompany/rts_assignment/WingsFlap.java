@@ -4,6 +4,7 @@
  */
 package com.mycompany.rts_assignment;
 
+import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -32,15 +33,18 @@ public class WingsFlap implements Runnable{
 
     public void receiveWingsCommand() {
         try {
-            String queueName = "wingsAngle";
+            String exchangeName = "CommandExchange";
+            String routingKey = "wings";
 
             ConnectionFactory cf = new ConnectionFactory();
             Connection con = cf.newConnection();
             Channel chan = con.createChannel();
 
-            chan.queueDeclare(queueName, false, false, false, null);
+            chan.exchangeDeclare(exchangeName, "direct");
 
-            //use the channel to consume/receive the message
+            String queueName = chan.queueDeclare().getQueue();
+            chan.queueBind(queueName, exchangeName, routingKey);
+
             chan.basicConsume(queueName, (x, msg) -> {
                 String m = new String(msg.getBody(), "UTF-8");
                 angle = Integer.parseInt(m);

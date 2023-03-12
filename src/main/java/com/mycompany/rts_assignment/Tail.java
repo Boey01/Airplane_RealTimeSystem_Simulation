@@ -32,15 +32,18 @@ public class Tail implements Runnable{
 
     public void receiveTailCommand() {
         try {
-            String queueName = "tailAngle";
+            String exchangeName = "CommandExchange";
+            String routingKey = "tail";
 
             ConnectionFactory cf = new ConnectionFactory();
             Connection con = cf.newConnection();
             Channel chan = con.createChannel();
 
-            chan.queueDeclare(queueName, false, false, false, null);
+            chan.exchangeDeclare(exchangeName, "direct");
 
-            //use the channel to consume/receive the message
+            String queueName = chan.queueDeclare().getQueue();
+            chan.queueBind(queueName, exchangeName, routingKey);
+
             chan.basicConsume(queueName, (x, msg) -> {
                 String m = new String(msg.getBody(), "UTF-8");
                 angle = Integer.parseInt(m);

@@ -8,6 +8,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,6 +22,7 @@ public class PlaneController implements Runnable{
     int angleAdjust; //for wings
     int checkAlt;
     int offAngle =0;
+    ArrayList<SensoryData> commandList = new ArrayList<>();
     
 
     @Override
@@ -33,6 +35,8 @@ public class PlaneController implements Runnable{
            adjustDirection(offAngle);
            System.out.println("Off angle occurs: " + offAngle + " degree away from track.");
        }
+       
+       sendCommand();
     }
     
     public void adjustAltitude(int current_alt){
@@ -49,7 +53,7 @@ public class PlaneController implements Runnable{
             angleAdjust = 0;
         }
    
-        sendWingsCommand(angleAdjust);
+        commandList.add(new SensoryData(angleAdjust,"wings"));
 }
     
     public void adjustDirection(int offAngle){
@@ -58,7 +62,7 @@ public class PlaneController implements Runnable{
         angleAdjust = 20; 
     }else angleAdjust =-20;
         
-        sendTailCommand(angleAdjust);
+        commandList.add(new SensoryData(angleAdjust,"tail"));
     }
         
     public void receiveValues(){
@@ -91,45 +95,25 @@ public class PlaneController implements Runnable{
         
     }
     
-    public void sendWingsCommand(int angle){
-      String queueName = "wingsAngle";
-       try {          
-            ConnectionFactory cf = new ConnectionFactory();
-            Connection con = cf.newConnection();
-            Channel chan = con.createChannel();
-            
-            //convert message
-            String msg = Integer.toString(angle);
-
-            chan.queueDeclare(queueName,false,false,false,null);
-            
-            
-            chan.basicPublish("", queueName, null, msg.getBytes());
-            chan.close();
-            con.close();
-        } catch (IOException | TimeoutException ex) {
-            Logger.getLogger(AltitudeSensor.class.getName()).log(Level.SEVERE, null, ex);
-        }  
+    public void sendCommand() {
+        commandList.parallelStream().forEach(element -> {
+            processCommand(element);
+        });
+        commandList.clear();
     }
-    
-    public void sendTailCommand(int angle){
-      String queueName = "tailAngle";
-       try {          
-            ConnectionFactory cf = new ConnectionFactory();
-            Connection con = cf.newConnection();
-            Channel chan = con.createChannel();
-            
-            //convert message
-            String msg = Integer.toString(angle);
-            
-            chan.queueDeclare(queueName,false,false,false,null);
-            
-            
-            chan.basicPublish("", queueName, null, msg.getBytes());
-            chan.close();
-            con.close();
-        } catch (IOException | TimeoutException ex) {
-            Logger.getLogger(AltitudeSensor.class.getName()).log(Level.SEVERE, null, ex);
-        }  
+
+    public static void processCommand(SensoryData i) {
+        String ex = "CommandExchange";
+        ConnectionFactory f = new ConnectionFactory();
+
+        try (Connection con = f.newConnection()) {
+            Channel ch = con.createChannel();
+            ch.exchangeDeclare(ex, "direct");
+
+            ch.basicPublish(ex, i.routingKey, null, String.valueOf(i.data).getBytes());
+        } catch (IOException | TimeoutException ex1) {
+            Logger.getLogger(PlaneController.class.getName()).log(Level.SEVERE, null, ex1);
+        }
     }
 }
+
