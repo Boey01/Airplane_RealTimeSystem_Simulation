@@ -30,4 +30,27 @@ public class SystemPhase {
         max = (int) (idealAltitude*0.2);
         min = (int) (idealAltitude*-0.2);
     }
+    
+    public void changeOfAltitudeRules(int angle){
+        switch (angle) {
+            case 0:
+                this.resetAltitudeRange();
+                break;
+            case 25:
+                max = (int) (this.idealAltitude * 0.11);
+                break;
+            case -25:
+                min = (int) (this.idealAltitude * -0.11);
+                break;
+            case 45:
+                max = (int) (this.idealAltitude * 0.15);
+                break;
+            case -45:
+                min = (int) (this.idealAltitude * -0.15);
+                break;
+            default:
+                this.resetAltitudeRange();
+                break;
+        }
+    }
 }

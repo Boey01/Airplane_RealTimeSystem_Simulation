@@ -19,25 +19,24 @@ import java.util.logging.Logger;
  *
  * @author devil
  */
-public class Altitude implements Runnable{
+public class AltitudeSensor implements Runnable{
     SystemPhase phase;
     String queueName = "altitude";
     
     int altitude = SystemPhase.idealAltitude;
 
-    public Altitude(SystemPhase sp){
+    public AltitudeSensor(SystemPhase sp){
         this.phase = sp;
     }
     
     public void changeInAltitude() {
-        altitude += phase.giveRandom();
-
-        sendAltitudeValue(altitude);
+        altitude += phase.giveRandom();    
     }
 
     @Override
     public void run() {
         changeInAltitude();
+        sendAltitudeValue(altitude);
     }
 
     public void sendAltitudeValue(int alt){
@@ -48,17 +47,18 @@ public class Altitude implements Runnable{
             
             //convert message
             String msg = Integer.toString(alt);
+            
+            chan.queuePurge(queueName);
             chan.queueDeclare(queueName,false,false,false,null);
-
+            
             //publish the message to the exchange using the routing key
             chan.basicPublish("", queueName, null, msg.getBytes());
             chan.close();
             con.close();
         } catch (IOException | TimeoutException ex) {
-            Logger.getLogger(Altitude.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(AltitudeSensor.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
         
 }
-    
 

@@ -27,30 +27,7 @@ List<Integer> wingsCommand;
 
         System.out.println("Wings' angle has been adjusted to: " + angle);
 
-        switch (angle) {
-            case 0:
-                phase.resetAltitudeRange();
-                break;
-            case 25:
-                phase.min += (int) (phase.idealAltitude * 0.1);
-                phase.max += (int) (phase.idealAltitude * 0.1);
-                break;
-            case -25:
-                phase.min -= (int) (phase.idealAltitude * 0.1);
-                phase.max -= (int) (phase.idealAltitude * 0.1);
-                break;
-            case 45:
-                phase.min += (int) (phase.idealAltitude * 0.2);
-                phase.max += (int) (phase.idealAltitude * 0.2);
-                break;
-            case -45:
-                phase.min -= (int) (phase.idealAltitude * 0.2);
-                phase.max -= (int) (phase.idealAltitude * 0.2);
-                break;
-            default:
-                phase.resetAltitudeRange();
-                break;
-        }
+       
 
     }
     

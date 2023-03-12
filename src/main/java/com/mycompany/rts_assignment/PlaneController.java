@@ -41,8 +41,10 @@ public class PlaneController implements Runnable{
         int idealGap = (int) (SystemPhase.idealAltitude * 0.1);
         
         if (checkAlt > idealGap || checkAlt < -idealGap) {//if outside of ideal range
-            if(Math.abs(checkAlt) < idealGap*2)angleAdjust = 45; else angleAdjust= 25; //if it is really out of track
-            if(checkAlt < 0) angleAdjust = -angleAdjust; // if below ideal altitude, e.g: 900-1000=-100 lower, adjust wing down to glide downwards
+            if(Math.abs(checkAlt) > idealGap*2){
+                angleAdjust = 45;
+            } else angleAdjust= 25; //if it is really out of track
+            if(checkAlt > 0) angleAdjust = -angleAdjust; // if below ideal altitude, e.g: 900-1000=-100 lower, adjust wing down to glide downwards
 
         } else {
             angleAdjust = 0;
@@ -70,6 +72,10 @@ public class PlaneController implements Runnable{
         } catch (IOException | TimeoutException ex) {
             Logger.getLogger(PlaneController.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+    }
+    
+    public void sendWingsCommand(){
         
     }
 }

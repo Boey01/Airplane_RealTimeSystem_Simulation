@@ -21,7 +21,7 @@ public class Main {
     public static void main(String[] args) {
         ScheduledExecutorService es = Executors.newScheduledThreadPool(1);
         
-        es.scheduleAtFixedRate(new Altitude(phase), 0, SystemPhase.getSpeed(), TimeUnit.MILLISECONDS);
+        es.scheduleAtFixedRate(new AltitudeSensor(phase), 0, SystemPhase.getSpeed(), TimeUnit.MILLISECONDS);
         es.scheduleAtFixedRate(new PlaneController(wingsCommand), 0, SystemPhase.getSpeed(), TimeUnit.MILLISECONDS);
         es.scheduleAtFixedRate(new WingsFlap(wingsCommand,phase), 0, SystemPhase.getSpeed(), TimeUnit.MILLISECONDS);
         
