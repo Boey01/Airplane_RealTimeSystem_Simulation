@@ -21,7 +21,6 @@ import java.util.logging.Logger;
  */
 public class AltitudeSensor implements Runnable{
     SystemPhase phase;
-    String queueName = "altitude";
     
     int altitude = SystemPhase.idealAltitude;
 
@@ -40,6 +39,7 @@ public class AltitudeSensor implements Runnable{
     }
 
     public void sendAltitudeValue(int alt){
+       String queueName = "altitude";
        try {          
             ConnectionFactory cf = new ConnectionFactory();
             Connection con = cf.newConnection();
@@ -47,8 +47,7 @@ public class AltitudeSensor implements Runnable{
             
             //convert message
             String msg = Integer.toString(alt);
-            
-            chan.queuePurge(queueName);
+                       
             chan.queueDeclare(queueName,false,false,false,null);
             
             //publish the message to the exchange using the routing key

@@ -15,8 +15,8 @@ public class SystemPhase {
     static int idealAltitude = 1000; // maintain around 50 ~ 80
     
     Random rand = new Random();
-    int max = (int) (idealAltitude*0.2);
-    int min = (int) (idealAltitude*-0.2);
+    int max = (int) (idealAltitude*0.1);
+    int min = (int) (idealAltitude*-0.1);
     
     static public int getSpeed() {
         return speed;
@@ -27,8 +27,8 @@ public class SystemPhase {
     }
     
     public void resetAltitudeRange(){
-        max = (int) (idealAltitude*0.2);
-        min = (int) (idealAltitude*-0.2);
+        max = (int) (idealAltitude*0.1);
+        min = (int) (idealAltitude*-0.1);
     }
     
     public void changeOfAltitudeRules(int angle){
@@ -37,16 +37,16 @@ public class SystemPhase {
                 this.resetAltitudeRange();
                 break;
             case 25:
-                max = (int) (this.idealAltitude * 0.11);
-                break;
-            case -25:
-                min = (int) (this.idealAltitude * -0.11);
-                break;
-            case 45:
                 max = (int) (this.idealAltitude * 0.15);
                 break;
-            case -45:
+            case -25:
                 min = (int) (this.idealAltitude * -0.15);
+                break;
+            case 45:
+                max = (int) (this.idealAltitude * 0.2);
+                break;
+            case -45:
+                min = (int) (this.idealAltitude * -0.2);
                 break;
             default:
                 this.resetAltitudeRange();

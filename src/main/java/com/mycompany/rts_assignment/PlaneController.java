@@ -50,7 +50,7 @@ public class PlaneController implements Runnable{
             angleAdjust = 0;
         }
    
-    wingsCommand.add(angleAdjust);
+        sendWingsCommand(angleAdjust);
 }
     
     public void receiveAltitude(){
@@ -75,7 +75,24 @@ public class PlaneController implements Runnable{
         
     }
     
-    public void sendWingsCommand(){
-        
+    public void sendWingsCommand(int angle){
+      String queueName = "wingsAngle";
+       try {          
+            ConnectionFactory cf = new ConnectionFactory();
+            Connection con = cf.newConnection();
+            Channel chan = con.createChannel();
+            
+            //convert message
+            String msg = Integer.toString(angle);
+
+            chan.queueDeclare(queueName,false,false,false,null);
+            
+            //publish the message to the exchange using the routing key
+            chan.basicPublish("", queueName, null, msg.getBytes());
+            chan.close();
+            con.close();
+        } catch (IOException | TimeoutException ex) {
+            Logger.getLogger(AltitudeSensor.class.getName()).log(Level.SEVERE, null, ex);
+        }  
     }
 }
