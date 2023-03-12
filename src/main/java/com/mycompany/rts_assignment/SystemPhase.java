@@ -15,20 +15,34 @@ public class SystemPhase {
     static int idealAltitude = 1000; // maintain around 50 ~ 80
     
     Random rand = new Random();
-    int max = (int) (idealAltitude*0.1);
-    int min = (int) (idealAltitude*-0.1);
+    int altMax = (int) (idealAltitude*0.1);
+    int altMin = (int) (idealAltitude*-0.1);
+    
+    //oa means Off Angle
+    int oaMax = 15;
+    int oaMin = -15;
     
     static public int getSpeed() {
         return speed;
     }    
     
-    public int giveRandom(){
-   return rand.nextInt(max - min + 1) + min;
+    public int giveRandomAlt(){
+   return rand.nextInt(altMax - altMin + 1) + altMin;
     }
     
+    public int giveRandomOA(){
+   return rand.nextInt(oaMax - oaMin + 1) + oaMin;
+    }
+    
+    
     public void resetAltitudeRange(){
-        max = (int) (idealAltitude*0.1);
-        min = (int) (idealAltitude*-0.1);
+        altMax = (int) (idealAltitude*0.1);
+        altMin = (int) (idealAltitude*-0.1);
+    }
+    
+    public void resetOffAngleRange(){
+        oaMax = 10;
+        oaMin = -10;
     }
     
     public void changeOfAltitudeRules(int angle){
@@ -37,19 +51,38 @@ public class SystemPhase {
                 this.resetAltitudeRange();
                 break;
             case 25:
-                max = (int) (this.idealAltitude * 0.15);
+                altMax = (int) (this.idealAltitude * 0.15);
                 break;
             case -25:
-                min = (int) (this.idealAltitude * -0.15);
+                altMin = (int) (this.idealAltitude * -0.15);
                 break;
             case 45:
-                max = (int) (this.idealAltitude * 0.2);
+                altMax = (int) (this.idealAltitude * 0.2);
                 break;
             case -45:
-                min = (int) (this.idealAltitude * -0.2);
+                altMin = (int) (this.idealAltitude * -0.2);
                 break;
             default:
                 this.resetAltitudeRange();
+                break;
+        }
+    }
+    
+    public void changeOfDirection(int angle){
+        switch (angle) {
+            case 0:
+                this.resetOffAngleRange();
+                break;
+            case 20:
+                oaMax = 3;
+                oaMin = 0;
+                break;
+            case -20:
+                oaMin = -3;
+                oaMax = 0;
+                break;
+            default:
+                this.resetOffAngleRange();
                 break;
         }
     }

@@ -16,23 +16,23 @@ import java.util.logging.Logger;
  *
  * @author Boey
  */
-public class WingsFlap implements Runnable{
+public class Tail implements Runnable{
     SystemPhase phase;
     int angle = 0;
 
-    public WingsFlap(SystemPhase sp) {
+    public Tail(SystemPhase sp) {
         this.phase = sp;
     }
 
     @Override
     public void run() {
-        receiveWingsCommand();
-        adjustWingsAngle();
+        receiveTailCommand();
+        adjustTailAngle();
     }
 
-    public void receiveWingsCommand() {
+    public void receiveTailCommand() {
         try {
-            String queueName = "wingsAngle";
+            String queueName = "tailAngle";
 
             ConnectionFactory cf = new ConnectionFactory();
             Connection con = cf.newConnection();
@@ -53,14 +53,16 @@ public class WingsFlap implements Runnable{
 
     }
 
-    public void adjustWingsAngle() {
-        String upDown = "(Upwards)";
-        if (angle < 0) {
-            upDown = "(Downwards)";
-        }
-        if(angle ==0) upDown="";
+    public void adjustTailAngle(){ 
 
-        System.out.println("Wings' angle has been adjusted to: " + angle + upDown);
-        phase.changeOfAltitudeRules(angle);
+        String direction = "(Turn Right)";
+        if (angle < 0) {
+            direction = "(Turn Left)";
+        }
+        if(angle ==0) direction ="";
+
+        System.out.println("Tail's angle has been adjusted to: " + angle + direction);
+        phase.changeOfDirection(angle);
+    
     }
 }

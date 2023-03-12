@@ -29,7 +29,7 @@ public class AltitudeSensor implements Runnable{
     }
     
     public void changeInAltitude() {
-        altitude += phase.giveRandom();    
+        altitude += phase.giveRandomAlt();    
     }
 
     @Override

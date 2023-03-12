@@ -8,7 +8,6 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,23 +16,23 @@ import java.util.logging.Logger;
  *
  * @author Boey
  */
-public class PlaneController implements Runnable{
-    List<Integer> wingsCommand;
-    
+public class PlaneController implements Runnable{  
     int alt;
     int angleAdjust; //for wings
     int checkAlt;
+    int offAngle =0;
     
-    public PlaneController( List<Integer> wc){
-        this.wingsCommand = wc;
-    }   
 
     @Override
     public void run() {
-       this.receiveAltitude();
+       this.receiveValues();
        adjustAltitude(alt);
        System.out.println("Current altitude: " + alt);
        
+       if (offAngle != 0){
+           adjustDirection(offAngle);
+           System.out.println("Off angle occurs: " + offAngle + " degree away from track.");
+       }
     }
     
     public void adjustAltitude(int current_alt){
@@ -53,20 +52,37 @@ public class PlaneController implements Runnable{
         sendWingsCommand(angleAdjust);
 }
     
-    public void receiveAltitude(){
+    public void adjustDirection(int offAngle){
+        if (offAngle<0){
+        //assuume negative off angle = left
+        angleAdjust = 20; 
+    }else angleAdjust =-20;
+        
+        sendTailCommand(angleAdjust);
+    }
+        
+    public void receiveValues(){
         try {
-            String queueName = "altitude";
+            String queueName1 = "altitude";
+            String queueName2 = "gps";
             
             ConnectionFactory cf = new ConnectionFactory();
             Connection con = cf.newConnection();
             Channel chan = con.createChannel();
             
-            chan.queueDeclare(queueName,false,false,false,null);
+            chan.queueDeclare(queueName1,false,false,false,null);
+            chan.queueDeclare(queueName2,false,false,false,null);
             
-            //use the channel to consume/receive the message
-            chan.basicConsume(queueName,(x,msg)->{
+            //altitude
+            chan.basicConsume(queueName1,(x,msg)->{
                 String m = new String(msg.getBody(),"UTF-8");
                 alt = Integer.parseInt(m);
+            }, x->{});
+            
+            //gps
+            chan.basicConsume(queueName2,(x,msg)->{
+                String m = new String(msg.getBody(),"UTF-8");
+                offAngle = Integer.parseInt(m);
             }, x->{});
            
         } catch (IOException | TimeoutException ex) {
@@ -87,7 +103,28 @@ public class PlaneController implements Runnable{
 
             chan.queueDeclare(queueName,false,false,false,null);
             
-            //publish the message to the exchange using the routing key
+            
+            chan.basicPublish("", queueName, null, msg.getBytes());
+            chan.close();
+            con.close();
+        } catch (IOException | TimeoutException ex) {
+            Logger.getLogger(AltitudeSensor.class.getName()).log(Level.SEVERE, null, ex);
+        }  
+    }
+    
+    public void sendTailCommand(int angle){
+      String queueName = "tailAngle";
+       try {          
+            ConnectionFactory cf = new ConnectionFactory();
+            Connection con = cf.newConnection();
+            Channel chan = con.createChannel();
+            
+            //convert message
+            String msg = Integer.toString(angle);
+            
+            chan.queueDeclare(queueName,false,false,false,null);
+            
+            
             chan.basicPublish("", queueName, null, msg.getBytes());
             chan.close();
             con.close();
