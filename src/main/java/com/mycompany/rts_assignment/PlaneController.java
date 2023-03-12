@@ -22,6 +22,9 @@ public class PlaneController implements Runnable{
     int angleAdjust; //for wings
     int checkAlt;
     int offAngle =0;
+    int newSpeed =0;
+    int idealSpeed = 900; //km/h
+    
     ArrayList<SensoryData> commandList = new ArrayList<>();
     
 
@@ -35,13 +38,14 @@ public class PlaneController implements Runnable{
            adjustDirection(offAngle);
            System.out.println("Off angle occurs: " + offAngle + " degree away from track.");
        }
+       adjustSpeed();
        
        sendCommand();
     }
     
     public void adjustAltitude(int current_alt){
-        checkAlt = current_alt - SystemPhase.idealAltitude;
-        int idealGap = (int) (SystemPhase.idealAltitude * 0.1);
+        checkAlt = current_alt - SimulationAttributes.idealAltitude;
+        int idealGap = (int) (SimulationAttributes.idealAltitude * 0.1);
         
         if (checkAlt > idealGap || checkAlt < -idealGap) {//if outside of ideal range
             if(Math.abs(checkAlt) > idealGap*2){
@@ -64,11 +68,20 @@ public class PlaneController implements Runnable{
         
         commandList.add(new SensoryData(angleAdjust,"tail"));
     }
+    
+    public void adjustSpeed(){
+        int speedInstruc =0; // 0 do nothing, 1 slow down, 2 = speed up
+        if (newSpeed > (idealSpeed*1.1))speedInstruc = 1;//above ideal speed
+        if (newSpeed < (idealSpeed*1.1))speedInstruc = 2; 
+        
+        commandList.add(new SensoryData(speedInstruc,"engine"));
+    }
         
     public void receiveValues(){
         try {
             String queueName1 = "altitude";
             String queueName2 = "gps";
+            String queueName3 = "speed";
             
             ConnectionFactory cf = new ConnectionFactory();
             Connection con = cf.newConnection();
@@ -76,6 +89,7 @@ public class PlaneController implements Runnable{
             
             chan.queueDeclare(queueName1,false,false,false,null);
             chan.queueDeclare(queueName2,false,false,false,null);
+            chan.queueDeclare(queueName3,false,false,false,null);
             
             //altitude
             chan.basicConsume(queueName1,(x,msg)->{
@@ -87,6 +101,12 @@ public class PlaneController implements Runnable{
             chan.basicConsume(queueName2,(x,msg)->{
                 String m = new String(msg.getBody(),"UTF-8");
                 offAngle = Integer.parseInt(m);
+            }, x->{});
+            
+            //speed
+            chan.basicConsume(queueName3,(x,msg)->{
+                String m = new String(msg.getBody(),"UTF-8");
+                newSpeed = Integer.parseInt(m);
             }, x->{});
            
         } catch (IOException | TimeoutException ex) {

@@ -8,6 +8,16 @@ package com.mycompany.rts_assignment;
  *
  * @author Boey
  */
-public class Main {
+public class PressureSensor {
+    int pressure,altitude,speed;
+    int temperature = 25;
     
+    public void altitudeChanged(int alt) {
+       
+        System.out.println();
+    }
+
+    void speedChanged(int speed) {
+        
+    }
 }

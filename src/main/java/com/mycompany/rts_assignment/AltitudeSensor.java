@@ -9,8 +9,6 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,21 +18,23 @@ import java.util.logging.Logger;
  * @author devil
  */
 public class AltitudeSensor implements Runnable{
-    SystemPhase phase;
+    SimulationAttributes simulation;
+    PressureSensor pressureObserver;
     
-    int altitude = SystemPhase.idealAltitude;
+    int altitude = SimulationAttributes.idealAltitude;
 
-    public AltitudeSensor(SystemPhase sp){
-        this.phase = sp;
+    public AltitudeSensor(SimulationAttributes sa){
+        this.simulation = sa;
     }
     
     public void changeInAltitude() {
-        altitude += phase.giveRandomAlt();    
+        altitude += simulation.giveRandomAlt();    
     }
 
     @Override
     public void run() {
         changeInAltitude();
+        notifyPressureObserver();
         sendAltitudeValue(altitude);
     }
 
@@ -58,6 +58,15 @@ public class AltitudeSensor implements Runnable{
             Logger.getLogger(AltitudeSensor.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    public void addPressureObserver(PressureSensor ps) {
+        this.pressureObserver = ps;
+    }
         
+    public void notifyPressureObserver(){
+        if(pressureObserver!=null){
+            pressureObserver.altitudeChanged(altitude); 
+        }
+    }
 }
 

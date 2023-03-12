@@ -8,6 +8,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import java.io.IOException;
+import java.util.Random;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,34 +17,41 @@ import java.util.logging.Logger;
  *
  * @author Boey
  */
-public class GPSSensor implements Runnable{
+public class SpeedSensor implements Runnable{
     SimulationAttributes simulation;
+    PressureSensor pressureObserver;
+    int speed;
+    Random rand = new Random();
     
-    int offAngle=0;
-
-    public GPSSensor(SimulationAttributes sa){
-        this.simulation = sa;
-    }
-    
-     public void changeInOA() {
-        offAngle += simulation.giveRandomOA();    
+    public SpeedSensor(SimulationAttributes s) {
+        this.simulation = s;
     }
 
     @Override
     public void run() {
-        changeInOA();
-        sendGPSValue(offAngle);
+        changeInSpeed();
+        System.out.println("Current plane speed:" + simulation.planespeed);
+        sendNewSpeed(simulation.planespeed);
+        notifyPressureObserver();
+        
     }
-
-    public void sendGPSValue(int offAngle){
-       String queueName = "gps";
+    
+    public void changeInSpeed(){
+        speed = rand.nextInt(20);
+        if(rand.nextBoolean())speed = -speed;  
+        
+        simulation.planespeed += speed;
+    }
+    
+    public void sendNewSpeed(int speed){
+       String queueName = "speed";
        try {          
             ConnectionFactory cf = new ConnectionFactory();
             Connection con = cf.newConnection();
             Channel chan = con.createChannel();
             
             //convert message
-            String msg = Integer.toString(offAngle);
+            String msg = Integer.toString(speed);
                        
             chan.queueDeclare(queueName,false,false,false,null);
             
@@ -55,5 +63,14 @@ public class GPSSensor implements Runnable{
             Logger.getLogger(AltitudeSensor.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-      
+    
+    public void addPressureObserver(PressureSensor ps) {
+        this.pressureObserver = ps;
+    }
+        
+    public void notifyPressureObserver(){
+        if(pressureObserver!=null){
+            pressureObserver.speedChanged(speed); 
+        }
+    }
 }

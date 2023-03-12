@@ -4,11 +4,11 @@
  */
 package com.mycompany.rts_assignment;
 
-import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import java.io.IOException;
+import java.util.Random;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,24 +17,30 @@ import java.util.logging.Logger;
  *
  * @author Boey
  */
-public class WingsFlap implements Runnable{
-    SimulationAttributes phase;
-    int angle = 0;
+public class Engine implements Runnable {
+    SimulationAttributes simulation;
+    Random rand = new Random();
+    int engineInstruction;
 
-    public WingsFlap(SimulationAttributes sp) {
-        this.phase = sp;
+    public Engine(SimulationAttributes s) {
+        this.simulation = s;
     }
 
     @Override
     public void run() {
-        receiveWingsCommand();
-        adjustWingsAngle();
+        receiveEngineCommand();
+        if (engineInstruction ==1){
+            simulation.planespeed -= rand.nextInt(20);
+        }
+        if (engineInstruction ==2){
+            simulation.planespeed += rand.nextInt(20);
+        }
+    
     }
-
-    public void receiveWingsCommand() {
+        public void receiveEngineCommand() {
         try {
             String exchangeName = "CommandExchange";
-            String routingKey = "wings";
+            String routingKey = "engine";
 
             ConnectionFactory cf = new ConnectionFactory();
             Connection con = cf.newConnection();
@@ -47,7 +53,7 @@ public class WingsFlap implements Runnable{
 
             chan.basicConsume(queueName, (x, msg) -> {
                 String m = new String(msg.getBody(), "UTF-8");
-                angle = Integer.parseInt(m);
+                engineInstruction = Integer.parseInt(m);
             }, x -> {
             });
 
@@ -55,16 +61,5 @@ public class WingsFlap implements Runnable{
             Logger.getLogger(PlaneController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-    }
-
-    public void adjustWingsAngle() {
-        String upDown = "(Upwards)";
-        if (angle < 0) {
-            upDown = "(Downwards)";
-        }
-        if(angle ==0) upDown="";
-
-        System.out.println("Wings' angle has been adjusted to: " + angle + upDown);
-        phase.changeOfAltitudeRules(angle);
     }
 }

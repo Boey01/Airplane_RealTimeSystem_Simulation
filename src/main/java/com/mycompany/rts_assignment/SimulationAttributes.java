@@ -10,9 +10,10 @@ import java.util.Random;
  *
  * @author Boey
  */
-public class SystemPhase {
-    static int speed = 500; //1000 millisec or 1 sec
+public class SimulationAttributes {
+    static int simulationSpeed = 500; //1000 millisec or 1 sec
     static int idealAltitude = 1000; // maintain around 50 ~ 80
+    int planespeed = 100;
     
     Random rand = new Random();
     int altMax = (int) (idealAltitude*0.1);
@@ -23,7 +24,7 @@ public class SystemPhase {
     int oaMin = -15;
     
     static public int getSpeed() {
-        return speed;
+        return simulationSpeed;
     }    
     
     public int giveRandomAlt(){

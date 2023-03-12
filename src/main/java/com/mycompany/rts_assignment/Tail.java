@@ -17,10 +17,10 @@ import java.util.logging.Logger;
  * @author Boey
  */
 public class Tail implements Runnable{
-    SystemPhase phase;
+    SimulationAttributes phase;
     int angle = 0;
 
-    public Tail(SystemPhase sp) {
+    public Tail(SimulationAttributes sp) {
         this.phase = sp;
     }
 
@@ -57,7 +57,6 @@ public class Tail implements Runnable{
     }
 
     public void adjustTailAngle(){ 
-
         String direction = "(Turn Right)";
         if (angle < 0) {
             direction = "(Turn Left)";
