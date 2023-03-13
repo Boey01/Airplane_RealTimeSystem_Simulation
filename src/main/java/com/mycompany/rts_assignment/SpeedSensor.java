@@ -4,6 +4,7 @@
  */
 package com.mycompany.rts_assignment;
 
+import Observers.Observer;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -19,7 +20,7 @@ import java.util.logging.Logger;
  */
 public class SpeedSensor implements Runnable{
     SimulationAttributes simulation;
-    PressureSensor pressureObserver;
+    Observer pressureObserver;
     int speed;
     Random rand = new Random();
     
@@ -63,13 +64,13 @@ public class SpeedSensor implements Runnable{
         }
     }
     
-    public void addPressureObserver(PressureSensor ps) {
+    public void addPressureObserver(Observer ps) {
         this.pressureObserver = ps;
     }
         
     public void notifyPressureObserver(){
         if(pressureObserver!=null){
-            pressureObserver.speedChanged(speed); 
+            pressureObserver.updateObserver(new SensoryData(simulation.planespeed,"speed"));
         }
     }
 }

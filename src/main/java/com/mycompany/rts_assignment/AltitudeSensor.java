@@ -5,6 +5,7 @@
 
 package com.mycompany.rts_assignment;
 
+import Observers.Observer;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -19,7 +20,7 @@ import java.util.logging.Logger;
  */
 public class AltitudeSensor implements Runnable{
     SimulationAttributes simulation;
-    PressureSensor pressureObserver;
+    Observer pressureObserver;
     
     int altitude = SimulationAttributes.idealAltitude;
 
@@ -59,13 +60,13 @@ public class AltitudeSensor implements Runnable{
         }
     }
     
-    public void addPressureObserver(PressureSensor ps) {
+    public void addPressureObserver(Observer ps) {
         this.pressureObserver = ps;
     }
         
     public void notifyPressureObserver(){
         if(pressureObserver!=null){
-            pressureObserver.altitudeChanged(altitude); 
+            pressureObserver.updateObserver(new SensoryData(altitude,"altitude"));
         }
     }
 }

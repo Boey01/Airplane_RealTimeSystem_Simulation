@@ -7,8 +7,15 @@ package com.mycompany.rts_assignment;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,17 +30,21 @@ public class PlaneController implements Runnable{
     int checkAlt;
     int offAngle =0;
     int newSpeed =0;
-    int idealSpeed = 900; //km/h
+    int idealSpeed = 850; //km/h
     GUI gui;
     ArrayList<SensoryData> commandList = new ArrayList<>();
-
-    public PlaneController(GUI gui) {
+    Future<Object> cruisingMode;
+            
+    public PlaneController(GUI gui, Future<Object> logic) {
         this.gui = gui;
+        cruisingMode = logic;
     }
 
     @Override
     public void run() {
-       this.receiveValues();
+       
+    this.receiveValues();
+    if (!cruisingMode.isDone()){    
        adjustAltitude(alt);
        //System.out.println("Current altitude: " + alt);
        gui.taAltitude.append("Current altitude: " + alt +"\n");
@@ -44,14 +55,25 @@ public class PlaneController implements Runnable{
           // System.out.println("Off angle occurs: " + offAngle + " degree away from track.");
            gui.taGPS.append("Off angle occurs: " + offAngle + " degree away from track."+"\n");
            gui.txtOA.setText(String.valueOf(offAngle));
-       }
+       }       
        
        //System.out.println("Current plane speed:" + newSpeed);
-       gui.txtSpeed.setText(String.valueOf(newSpeed));
-       
+       gui.txtSpeed.setText(String.valueOf(newSpeed));       
        adjustSpeed();
        
        sendCommand();
+        }
+    else{
+   //start landing -------------------
+    System.out.println("Plane is going to landing mode.");
+   while(alt > 300){
+       //angleAdjust = -45;
+       
+   }
+   
+   // sendCommand();
+   //---------------------------------
+    }
     }
     
     public void adjustAltitude(int current_alt){
@@ -146,5 +168,6 @@ public class PlaneController implements Runnable{
             Logger.getLogger(PlaneController.class.getName()).log(Level.SEVERE, null, ex1);
         }
     }
+    
 }
 
