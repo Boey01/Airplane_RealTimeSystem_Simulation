@@ -2,9 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.mycompany.rts_assignment;
+package Actuators;
 
-import com.rabbitmq.client.BuiltinExchangeType;
+import com.mycompany.rts_assignment.GUI;
+import com.mycompany.rts_assignment.PlaneController;
+import com.mycompany.rts_assignment.SimulationAttributes;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -17,26 +19,27 @@ import java.util.logging.Logger;
  *
  * @author Boey
  */
-public class WingsFlap implements Runnable{
+public class Tail implements Runnable{
     SimulationAttributes phase;
     int angle = 0;
     GUI gui;
 
-    public WingsFlap(SimulationAttributes sp,GUI gui) {
+    public Tail(SimulationAttributes sp, GUI gui) {
         this.phase = sp;
-        this.gui =gui;
+        this.gui = gui;
     }
 
     @Override
     public void run() {
-        receiveWingsCommand();
-        adjustWingsAngle();
+        gui.taGPS.append("Tail thread triggered----------------\n");
+        receiveTailCommand();
+        adjustTailAngle();
     }
 
-    public void receiveWingsCommand() {
+    public void receiveTailCommand() {
         try {
             String exchangeName = "CommandExchange";
-            String routingKey = "wings";
+            String routingKey = "tail";
 
             ConnectionFactory cf = new ConnectionFactory();
             Connection con = cf.newConnection();
@@ -59,16 +62,17 @@ public class WingsFlap implements Runnable{
 
     }
 
-    public void adjustWingsAngle() {
-        String upDown = "(Upwards)";
+    public void adjustTailAngle(){ 
+        String direction = "(Turn Right)";
         if (angle < 0) {
-            upDown = "(Downwards)";
+            direction = "(Turn Left)";
         }
-        if(angle ==0) upDown="";
+        if(angle ==0) direction ="";
 
-        //System.out.println("Wings' angle has been adjusted to: " + angle + upDown);
-        gui.taAltitude.append("Wings' angle adjusted to: " + angle + upDown + "\n");
-        gui.txtWA.setText(String.valueOf(angle));
-        phase.changeOfAltitudeRules(angle);
+       // System.out.println("Tail's angle has been adjusted to: " + angle + direction);
+        gui.taGPS.append("Tail's angle adjusted to: " + angle + direction+"\n");
+        gui.txtTA.setText(String.valueOf(angle));
+        phase.changeOfDirection(angle);
+    
     }
 }

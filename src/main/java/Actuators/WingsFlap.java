@@ -2,13 +2,16 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.mycompany.rts_assignment;
+package Actuators;
 
+import com.mycompany.rts_assignment.GUI;
+import com.mycompany.rts_assignment.PlaneController;
+import com.mycompany.rts_assignment.SimulationAttributes;
+import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import java.io.IOException;
-import java.util.Random;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,30 +20,26 @@ import java.util.logging.Logger;
  *
  * @author Boey
  */
-public class Engine implements Runnable {
-    SimulationAttributes simulation;
-    Random rand = new Random();
-    int engineInstruction;
+public class WingsFlap implements Runnable{
+    SimulationAttributes phase;
+    int angle = 0;
+    GUI gui;
 
-    public Engine(SimulationAttributes s) {
-        this.simulation = s;
+    public WingsFlap(SimulationAttributes sp,GUI gui) {
+        this.phase = sp;
+        this.gui =gui;
     }
 
     @Override
     public void run() {
-        receiveEngineCommand();
-        if (engineInstruction ==1){
-            simulation.planespeed -= rand.nextInt(20);
-        }
-        if (engineInstruction ==2){
-            simulation.planespeed += rand.nextInt(20);
-        }
-    
+        receiveWingsCommand();
+        adjustWingsAngle();
     }
-        public void receiveEngineCommand() {
+
+    public void receiveWingsCommand() {
         try {
             String exchangeName = "CommandExchange";
-            String routingKey = "engine";
+            String routingKey = "wings";
 
             ConnectionFactory cf = new ConnectionFactory();
             Connection con = cf.newConnection();
@@ -53,7 +52,7 @@ public class Engine implements Runnable {
 
             chan.basicConsume(queueName, (x, msg) -> {
                 String m = new String(msg.getBody(), "UTF-8");
-                engineInstruction = Integer.parseInt(m);
+                angle = Integer.parseInt(m);
             }, x -> {
             });
 
@@ -61,5 +60,18 @@ public class Engine implements Runnable {
             Logger.getLogger(PlaneController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+
+    public void adjustWingsAngle() {
+        String upDown = "(Upwards)";
+        if (angle < 0) {
+            upDown = "(Downwards)";
+        }
+        if(angle ==0) upDown="";
+
+        //System.out.println("Wings' angle has been adjusted to: " + angle + upDown);
+        gui.taAltitude.append("Wings' angle adjusted to: " + angle + upDown + "\n");
+        gui.txtWA.setText(String.valueOf(angle));
+        phase.changeOfAltitudeRules(angle);
     }
 }

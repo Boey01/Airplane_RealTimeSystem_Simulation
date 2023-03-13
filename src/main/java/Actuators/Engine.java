@@ -2,12 +2,15 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.mycompany.rts_assignment;
+package Actuators;
 
+import com.mycompany.rts_assignment.PlaneController;
+import com.mycompany.rts_assignment.SimulationAttributes;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import java.io.IOException;
+import java.util.Random;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,26 +19,30 @@ import java.util.logging.Logger;
  *
  * @author Boey
  */
-public class Tail implements Runnable{
-    SimulationAttributes phase;
-    int angle = 0;
-    GUI gui;
+public class Engine implements Runnable {
+    SimulationAttributes simulation;
+    Random rand = new Random();
+    int engineInstruction;
 
-    public Tail(SimulationAttributes sp, GUI gui) {
-        this.phase = sp;
-        this.gui = gui;
+    public Engine(SimulationAttributes s) {
+        this.simulation = s;
     }
 
     @Override
     public void run() {
-        receiveTailCommand();
-        adjustTailAngle();
+        receiveEngineCommand();
+        if (engineInstruction ==1){
+            simulation.planespeed -= rand.nextInt(20);
+        }
+        if (engineInstruction ==2){
+            simulation.planespeed += rand.nextInt(20);
+        }
+    
     }
-
-    public void receiveTailCommand() {
+        public void receiveEngineCommand() {
         try {
             String exchangeName = "CommandExchange";
-            String routingKey = "tail";
+            String routingKey = "engine";
 
             ConnectionFactory cf = new ConnectionFactory();
             Connection con = cf.newConnection();
@@ -48,7 +55,7 @@ public class Tail implements Runnable{
 
             chan.basicConsume(queueName, (x, msg) -> {
                 String m = new String(msg.getBody(), "UTF-8");
-                angle = Integer.parseInt(m);
+                engineInstruction = Integer.parseInt(m);
             }, x -> {
             });
 
@@ -56,19 +63,5 @@ public class Tail implements Runnable{
             Logger.getLogger(PlaneController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-    }
-
-    public void adjustTailAngle(){ 
-        String direction = "(Turn Right)";
-        if (angle < 0) {
-            direction = "(Turn Left)";
-        }
-        if(angle ==0) direction ="";
-
-        //System.out.println("Tail's angle has been adjusted to: " + angle + direction);
-        gui.taGPS.append("Tail's angle adjusted to: " + angle + direction+"\n");
-        gui.txtTA.setText(String.valueOf(angle));
-        phase.changeOfDirection(angle);
-    
     }
 }

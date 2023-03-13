@@ -11,17 +11,17 @@ import java.util.Random;
  * @author Boey
  */
 public class SimulationAttributes {
-    static int simulationSpeed = 500; //1000 millisec or 1 sec
-    static int idealAltitude = 1000; // maintain around 50 ~ 80
-    int planespeed = 850;
+    static public int simulationSpeed = 500; //1000 millisec or 1 sec
+    static public int idealAltitude = 1000; // maintain around 50 ~ 80
+    public int planespeed = 850;
     
     Random rand = new Random();
-    int altMax = (int) (idealAltitude*0.1);
-    int altMin = (int) (idealAltitude*-0.1);
+    public int altMax = (int) (idealAltitude*0.1);
+    public int altMin = (int) (idealAltitude*-0.1);
     
     //oa means Off Angle
-    int oaMax = 15;
-    int oaMin = -15;
+    public int oaMax = 15;
+    public int oaMin = -15;
     
     static public int getSpeed() {
         return simulationSpeed;

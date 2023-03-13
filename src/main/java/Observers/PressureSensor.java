@@ -4,6 +4,7 @@
  */
 package Observers;
 
+import Sensories.SensoryData;
 import com.mycompany.rts_assignment.*;
 
 /**
@@ -33,6 +34,10 @@ public class PressureSensor implements Observer{
         pressure = (altitude+speed)/temperature;
         //System.out.println("Cabin Pressure: "+pressure);
         gui.txtPressure.setText(String.valueOf(pressure));
+        
+        if(pressure >= 100){
+            
+        }
     }
     
     public void altitudeChanged(int alt) {

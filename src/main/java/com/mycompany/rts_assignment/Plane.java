@@ -4,6 +4,12 @@
  */
 package com.mycompany.rts_assignment;
 
+import Actuators.Tail;
+import Actuators.WingsFlap;
+import Actuators.Engine;
+import Sensories.GPSSensor;
+import Sensories.AltitudeSensor;
+import Sensories.SpeedSensor;
 import Observers.PressureSensor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

@@ -4,6 +4,7 @@
  */
 package com.mycompany.rts_assignment;
 
+import Sensories.SensoryData;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -66,10 +67,10 @@ public class PlaneController implements Runnable{
     else{
    //start landing -------------------
     System.out.println("Plane is going to landing mode.");
-   while(alt > 300){
+   //while(alt > 300){
        //angleAdjust = -45;
        
-   }
+   //}
    
    // sendCommand();
    //---------------------------------
