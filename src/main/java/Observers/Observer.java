@@ -11,5 +11,6 @@ import Sensories.SensoryData;
  * @author Boey
  */
 public interface Observer {
+    public void updateObserver();
     public void updateObserver(SensoryData data);
 }

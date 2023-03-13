@@ -4,18 +4,13 @@
  */
 package com.mycompany.rts_assignment;
 
+import Observers.Observer;
 import Sensories.SensoryData;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
@@ -32,9 +27,12 @@ public class PlaneController implements Runnable{
     int offAngle =0;
     int newSpeed =0;
     int idealSpeed = 850; //km/h
+    int cabinPressure =0;
     GUI gui;
     ArrayList<SensoryData> commandList = new ArrayList<>();
     Future<Object> cruisingMode;
+    Observer cabinMask,wheelGear;
+    
             
     public PlaneController(GUI gui, Future<Object> logic) {
         this.gui = gui;
@@ -43,14 +41,15 @@ public class PlaneController implements Runnable{
 
     @Override
     public void run() {
-       
     this.receiveValues();
     if (!cruisingMode.isDone()){    
+       //altitude -------------------------
        adjustAltitude(alt);
        //System.out.println("Current altitude: " + alt);
        gui.taAltitude.append("Current altitude: " + alt +"\n");
        gui.txtAlt.setText(String.valueOf(alt));
        
+       //directions/GPS -----------------------------
        if (offAngle != 0){
            adjustDirection(offAngle);
           // System.out.println("Off angle occurs: " + offAngle + " degree away from track.");
@@ -58,10 +57,15 @@ public class PlaneController implements Runnable{
            gui.txtOA.setText(String.valueOf(offAngle));
        }       
        
+       //speed -----------------------------------
        //System.out.println("Current plane speed:" + newSpeed);
        gui.txtSpeed.setText(String.valueOf(newSpeed));       
        adjustSpeed();
        
+       // Pressure----------------------------------------
+        gui.txtPressure.setText(String.valueOf(cabinPressure));
+        checkPressure();
+        
        sendCommand();
         }
     else{
@@ -110,12 +114,20 @@ public class PlaneController implements Runnable{
         
         commandList.add(new SensoryData(speedInstruc,"engine"));
     }
-        
+     
+    public void checkPressure(){       
+        if (cabinPressure >= 100){
+            gui.taAlerts.append("!!!Cabin pressure is at abnormal level: " +cabinPressure+ "!!!\n");
+            cabinMask.updateObserver();
+        }
+    }
+    
     public void receiveValues(){
         try {
             String queueName1 = "altitude";
             String queueName2 = "gps";
             String queueName3 = "speed";
+            String queueName4 = "pressure";
             
             ConnectionFactory cf = new ConnectionFactory();
             Connection con = cf.newConnection();
@@ -124,6 +136,7 @@ public class PlaneController implements Runnable{
             chan.queueDeclare(queueName1,false,false,false,null);
             chan.queueDeclare(queueName2,false,false,false,null);
             chan.queueDeclare(queueName3,false,false,false,null);
+            chan.queueDeclare(queueName4,false,false,false,null);
             
             //altitude
             chan.basicConsume(queueName1,(x,msg)->{
@@ -141,6 +154,12 @@ public class PlaneController implements Runnable{
             chan.basicConsume(queueName3,(x,msg)->{
                 String m = new String(msg.getBody(),"UTF-8");
                 newSpeed = Integer.parseInt(m);
+            }, x->{});
+            
+            //pressure
+            chan.basicConsume(queueName4,(x,msg)->{
+                String m = new String(msg.getBody(),"UTF-8");
+                cabinPressure = Integer.parseInt(m);
             }, x->{});
            
         } catch (IOException | TimeoutException ex) {
@@ -170,5 +189,12 @@ public class PlaneController implements Runnable{
         }
     }
     
+    public void addObserver(Observer o, boolean cabinmask){
+        if (cabinmask) {
+            this.cabinMask = o;
+        } else {
+            this.wheelGear = o;
+        }
+    }
 }
 

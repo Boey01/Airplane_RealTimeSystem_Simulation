@@ -4,6 +4,7 @@
  */
 package com.mycompany.rts_assignment;
 
+import Sensories.AltitudeSensor;
 import java.awt.Rectangle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,13 +16,19 @@ import javax.swing.text.BadLocationException;
  * @author Boey
  */
 public class GUI extends javax.swing.JFrame {
-
+AltitudeSensor as;
+    
     /**
      * Creates new form GUI
      */
-    public GUI() {
+
+ public GUI() {
         initComponents();
     }
+ 
+ public void importAltitudeSensor(AltitudeSensor as){
+     this.as = as;
+ }
 
     
     /**
@@ -229,7 +236,7 @@ public class GUI extends javax.swing.JFrame {
     }//GEN-LAST:event_btnLandingActionPerformed
 
     private void btnCabinPressureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCabinPressureActionPerformed
-        // TODO add your handling code here:
+      as.altitude += 500;
     }//GEN-LAST:event_btnCabinPressureActionPerformed
 
     /**

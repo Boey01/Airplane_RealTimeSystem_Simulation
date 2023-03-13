@@ -23,7 +23,7 @@ public class AltitudeSensor implements Runnable{
     SimulationAttributes simulation;
     Observer pressureObserver;
     
-    int altitude = SimulationAttributes.idealAltitude;
+    public int altitude = SimulationAttributes.idealAltitude;
 
     public AltitudeSensor(SimulationAttributes sa){
         this.simulation = sa;
@@ -52,7 +52,6 @@ public class AltitudeSensor implements Runnable{
                        
             chan.queueDeclare(queueName,false,false,false,null);
             
-            //publish the message to the exchange using the routing key
             chan.basicPublish("", queueName, null, msg.getBytes());
             chan.close();
             con.close();

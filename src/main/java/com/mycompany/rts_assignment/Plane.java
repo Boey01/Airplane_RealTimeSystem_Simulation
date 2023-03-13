@@ -7,6 +7,7 @@ package com.mycompany.rts_assignment;
 import Actuators.Tail;
 import Actuators.WingsFlap;
 import Actuators.Engine;
+import Observers.CabinMask;
 import Sensories.GPSSensor;
 import Sensories.AltitudeSensor;
 import Sensories.SpeedSensor;
@@ -38,12 +39,15 @@ public class Plane {
    static PressureSensor ps = new PressureSensor(gui);
    static SpeedSensor ss = new SpeedSensor(simulation);
    static Engine engine = new Engine(simulation);
+   static CabinMask cm = new CabinMask(gui);
         
     public static void main(String[] args) {
         as.addPressureObserver(ps);
         ss.addPressureObserver(ps);
+        pc.addObserver(cm, true);
         gui.setVisible(true);
-         
+        gui.importAltitudeSensor(as); 
+        
         ScheduledExecutorService es = Executors.newScheduledThreadPool(1);
         
         es.scheduleAtFixedRate(as, 0, SimulationAttributes.getSpeed(), TimeUnit.MILLISECONDS);

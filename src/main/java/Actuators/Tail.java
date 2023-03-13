@@ -31,7 +31,6 @@ public class Tail implements Runnable{
 
     @Override
     public void run() {
-        gui.taGPS.append("Tail thread triggered----------------\n");
         receiveTailCommand();
         adjustTailAngle();
     }

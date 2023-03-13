@@ -47,8 +47,7 @@ public class GPSSensor implements Runnable{
             String msg = Integer.toString(offAngle);
                        
             chan.queueDeclare(queueName,false,false,false,null);
-            
-            //publish the message to the exchange using the routing key
+                        
             chan.basicPublish("", queueName, null, msg.getBytes());
             chan.close();
             con.close();

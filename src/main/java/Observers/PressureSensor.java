@@ -6,6 +6,13 @@ package Observers;
 
 import Sensories.SensoryData;
 import com.mycompany.rts_assignment.*;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -21,6 +28,11 @@ public class PressureSensor implements Observer{
         this.gui = gui;
     }
     
+    @Override
+    public void updateObserver() {
+
+    }
+
      @Override
     public void updateObserver(SensoryData data) {
         sd = data;
@@ -33,11 +45,8 @@ public class PressureSensor implements Observer{
         }       
         pressure = (altitude+speed)/temperature;
         //System.out.println("Cabin Pressure: "+pressure);
-        gui.txtPressure.setText(String.valueOf(pressure));
         
-        if(pressure >= 100){
-            
-        }
+        sendPressureValue(pressure);
     }
     
     public void altitudeChanged(int alt) {
@@ -48,4 +57,25 @@ public class PressureSensor implements Observer{
         this.speed = speed;
     }
     
+    public void sendPressureValue(int pressure){
+        try {
+            String queueName = "pressure";
+            ConnectionFactory cf = new ConnectionFactory();
+            Connection con = cf.newConnection();
+            Channel chan = con.createChannel();
+            
+            //convert message
+            String msg = Integer.toString(pressure);
+                       
+            chan.queueDeclare(queueName,false,false,false,null);
+                        
+            chan.basicPublish("", queueName, null, msg.getBytes());
+            chan.close();
+            con.close();
+
+        } catch (IOException | TimeoutException ex) {
+            Logger.getLogger(PressureSensor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
 }
