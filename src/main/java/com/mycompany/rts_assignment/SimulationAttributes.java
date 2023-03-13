@@ -13,7 +13,7 @@ import java.util.Random;
 public class SimulationAttributes {
     static int simulationSpeed = 500; //1000 millisec or 1 sec
     static int idealAltitude = 1000; // maintain around 50 ~ 80
-    int planespeed = 100;
+    int planespeed = 900;
     
     Random rand = new Random();
     int altMax = (int) (idealAltitude*0.1);

@@ -13,21 +13,21 @@ import java.util.concurrent.TimeUnit;
  * @author devil
  */
 public class Plane {
-
+   static GUI gui = new GUI();
    static SimulationAttributes simulation = new SimulationAttributes(); 
    static AltitudeSensor as = new AltitudeSensor(simulation);
-   static PlaneController pc = new PlaneController(); 
-   static WingsFlap wf = new WingsFlap(simulation);
+   static PlaneController pc = new PlaneController(gui); 
+   static WingsFlap wf = new WingsFlap(simulation,gui);
    static GPSSensor gs = new GPSSensor(simulation);
-   static Tail tail = new Tail(simulation);
-   static PressureSensor ps = new PressureSensor();
+   static Tail tail = new Tail(simulation,gui);
+   static PressureSensor ps = new PressureSensor(gui);
    static SpeedSensor ss = new SpeedSensor(simulation);
    static Engine engine = new Engine(simulation);
    
     public static void main(String[] args) {
         as.addPressureObserver(ps);
         ss.addPressureObserver(ps);
-     
+        gui.setVisible(true);
         ScheduledExecutorService es = Executors.newScheduledThreadPool(1);
         
         es.scheduleAtFixedRate(as, 0, SimulationAttributes.getSpeed(), TimeUnit.MILLISECONDS);

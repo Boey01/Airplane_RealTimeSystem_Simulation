@@ -11,13 +11,26 @@ package com.mycompany.rts_assignment;
 public class PressureSensor {
     int pressure,altitude,speed;
     int temperature = 25;
+    GUI gui;
+
+    public PressureSensor(GUI gui) {
+        this.gui = gui;
+    }
+    
     
     public void altitudeChanged(int alt) {
-       
-        System.out.println();
+      this.altitude = alt;
+      checkPressure();
     }
 
-    void speedChanged(int speed) {
-        
+    public void speedChanged(int speed) {
+        this.speed = speed;
+        checkPressure();
+    }
+    
+    public void checkPressure(){
+        pressure = (altitude+speed)/temperature;
+        //System.out.println("Cabin Pressure: "+pressure);
+        gui.txtPressure.setText(String.valueOf(pressure));
     }
 }

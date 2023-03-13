@@ -30,7 +30,6 @@ public class SpeedSensor implements Runnable{
     @Override
     public void run() {
         changeInSpeed();
-        System.out.println("Current plane speed:" + simulation.planespeed);
         sendNewSpeed(simulation.planespeed);
         notifyPressureObserver();
         

@@ -20,9 +20,11 @@ import java.util.logging.Logger;
 public class WingsFlap implements Runnable{
     SimulationAttributes phase;
     int angle = 0;
+    GUI gui;
 
-    public WingsFlap(SimulationAttributes sp) {
+    public WingsFlap(SimulationAttributes sp,GUI gui) {
         this.phase = sp;
+        this.gui =gui;
     }
 
     @Override
@@ -64,7 +66,9 @@ public class WingsFlap implements Runnable{
         }
         if(angle ==0) upDown="";
 
-        System.out.println("Wings' angle has been adjusted to: " + angle + upDown);
+        //System.out.println("Wings' angle has been adjusted to: " + angle + upDown);
+        gui.taAltitude.append("Wings' angle adjusted to: " + angle + upDown + "\n");
+        gui.txtWA.setText(String.valueOf(angle));
         phase.changeOfAltitudeRules(angle);
     }
 }

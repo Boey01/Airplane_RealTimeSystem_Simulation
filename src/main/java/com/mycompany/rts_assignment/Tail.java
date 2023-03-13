@@ -19,9 +19,11 @@ import java.util.logging.Logger;
 public class Tail implements Runnable{
     SimulationAttributes phase;
     int angle = 0;
+    GUI gui;
 
-    public Tail(SimulationAttributes sp) {
+    public Tail(SimulationAttributes sp, GUI gui) {
         this.phase = sp;
+        this.gui = gui;
     }
 
     @Override
@@ -63,7 +65,9 @@ public class Tail implements Runnable{
         }
         if(angle ==0) direction ="";
 
-        System.out.println("Tail's angle has been adjusted to: " + angle + direction);
+        //System.out.println("Tail's angle has been adjusted to: " + angle + direction);
+        gui.taGPS.append("Tail's angle adjusted to: " + angle + direction+"\n");
+        gui.txtTA.setText(String.valueOf(angle));
         phase.changeOfDirection(angle);
     
     }

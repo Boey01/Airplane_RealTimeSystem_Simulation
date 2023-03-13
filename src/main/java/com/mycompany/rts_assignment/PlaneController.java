@@ -24,20 +24,31 @@ public class PlaneController implements Runnable{
     int offAngle =0;
     int newSpeed =0;
     int idealSpeed = 900; //km/h
-    
+    GUI gui;
     ArrayList<SensoryData> commandList = new ArrayList<>();
-    
+
+    public PlaneController(GUI gui) {
+        this.gui = gui;
+    }
 
     @Override
     public void run() {
        this.receiveValues();
        adjustAltitude(alt);
-       System.out.println("Current altitude: " + alt);
+       //System.out.println("Current altitude: " + alt);
+       gui.taAltitude.append("Current altitude: " + alt +"\n");
+       gui.txtAlt.setText(String.valueOf(alt));
        
        if (offAngle != 0){
            adjustDirection(offAngle);
-           System.out.println("Off angle occurs: " + offAngle + " degree away from track.");
+          // System.out.println("Off angle occurs: " + offAngle + " degree away from track.");
+           gui.taGPS.append("Off angle occurs: " + offAngle + " degree away from track."+"\n");
+           gui.txtOA.setText(String.valueOf(offAngle));
        }
+       
+       //System.out.println("Current plane speed:" + newSpeed);
+       gui.txtSpeed.setText(String.valueOf(newSpeed));
+       
        adjustSpeed();
        
        sendCommand();
