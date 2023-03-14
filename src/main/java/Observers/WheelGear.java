@@ -5,21 +5,31 @@
 package Observers;
 
 import Sensories.SensoryData;
+import com.mycompany.rts_assignment.GUI;
 
 /**
  *
  * @author Boey
  */
-public class WheelGear implements Observer{
+public class WheelGear implements Observer {
+
+    boolean open = false;
+    GUI gui;
+
+    public WheelGear(GUI gui) {
+        this.gui = gui;
+    }
 
     @Override
     public void updateObserver() {
-      
+         if (!open) {
+            gui.taAlerts.append("Airplane wheels are opened. \n");
+            open = true;
+        }
     }
-    
+
     @Override
-    public void updateObserver(SensoryData data) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void updateObserver(SensoryData data){       
     }
-    
+
 }

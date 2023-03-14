@@ -110,11 +110,6 @@ AltitudeSensor as;
         txtTA.setText("jTextField1");
 
         btnLanding.setText("LandingMode");
-        btnLanding.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLandingActionPerformed(evt);
-            }
-        });
 
         btnCabinPressure.setText("CabinPressure");
         btnCabinPressure.addActionListener(new java.awt.event.ActionListener() {
@@ -230,10 +225,6 @@ AltitudeSensor as;
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void btnLandingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLandingActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnLandingActionPerformed
 
     private void btnCabinPressureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCabinPressureActionPerformed
       as.altitude += 500;

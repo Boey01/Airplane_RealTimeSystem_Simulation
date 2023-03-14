@@ -4,6 +4,7 @@
  */
 package Actuators;
 
+import com.mycompany.rts_assignment.Plane;
 import com.mycompany.rts_assignment.PlaneController;
 import com.mycompany.rts_assignment.SimulationAttributes;
 import com.rabbitmq.client.Channel;
@@ -31,11 +32,18 @@ public class Engine implements Runnable {
     @Override
     public void run() {
         receiveEngineCommand();
+        
+        if(Plane.currentMode != Plane.Mode.closeLanding){
         if (engineInstruction ==1){
             simulation.planespeed -= rand.nextInt(20);
         }
         if (engineInstruction ==2){
             simulation.planespeed += rand.nextInt(20);
+        }
+        
+        if (engineInstruction ==3){
+            simulation.planespeed -= rand.nextInt(50);
+        }
         }
     
     }

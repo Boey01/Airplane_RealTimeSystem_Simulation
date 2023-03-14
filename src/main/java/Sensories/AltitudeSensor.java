@@ -6,6 +6,7 @@
 package Sensories;
 
 import Observers.Observer;
+import com.mycompany.rts_assignment.Plane;
 import com.mycompany.rts_assignment.SimulationAttributes;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -23,7 +24,7 @@ public class AltitudeSensor implements Runnable{
     SimulationAttributes simulation;
     Observer pressureObserver;
     
-    public int altitude = SimulationAttributes.idealAltitude;
+    public int altitude = SimulationAttributes.initialAltitude;
 
     public AltitudeSensor(SimulationAttributes sa){
         this.simulation = sa;
@@ -35,7 +36,12 @@ public class AltitudeSensor implements Runnable{
 
     @Override
     public void run() {
+        if(Plane.currentMode != Plane.Mode.closeLanding) {
         changeInAltitude();
+        }
+        else{
+         altitude -= 10;
+        }
         notifyPressureObserver();
         sendAltitudeValue(altitude);
     }

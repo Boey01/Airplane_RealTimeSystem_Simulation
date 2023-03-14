@@ -5,6 +5,7 @@
 package Sensories;
 
 import Observers.Observer;
+import com.mycompany.rts_assignment.Plane;
 import com.mycompany.rts_assignment.SimulationAttributes;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -31,14 +32,20 @@ public class SpeedSensor implements Runnable{
 
     @Override
     public void run() {
+        if(Plane.currentMode != Plane.Mode.closeLanding) {
         changeInSpeed();
+        }
+        else{
+            simulation.planespeed -= 10;
+        }
+        
         sendNewSpeed(simulation.planespeed);
         notifyPressureObserver();
         
     }
     
     public void changeInSpeed(){
-        speed = rand.nextInt(20);
+        speed = rand.nextInt(10);
         if(rand.nextBoolean())speed = -speed;  
         
         simulation.planespeed += speed;

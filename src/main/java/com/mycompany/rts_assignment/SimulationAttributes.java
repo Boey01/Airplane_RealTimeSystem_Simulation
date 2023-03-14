@@ -11,13 +11,13 @@ import java.util.Random;
  * @author Boey
  */
 public class SimulationAttributes {
-    static public int simulationSpeed = 500; //1000 millisec or 1 sec
-    static public int idealAltitude = 1000; // maintain around 50 ~ 80
+    static public int simulationSpeed = 500; //1000 millisec == 1 sec
+    static public int initialAltitude = 1000; 
     public int planespeed = 850;
     
     Random rand = new Random();
-    public int altMax = (int) (idealAltitude*0.1);
-    public int altMin = (int) (idealAltitude*-0.1);
+    public int altMax = (int) (initialAltitude*0.1);
+    public int altMin = (int) (initialAltitude*-0.1);
     
     //oa means Off Angle
     public int oaMax = 15;
@@ -37,8 +37,8 @@ public class SimulationAttributes {
     
     
     public void resetAltitudeRange(){
-        altMax = (int) (idealAltitude*0.1);
-        altMin = (int) (idealAltitude*-0.1);
+        altMax = (int) (initialAltitude*0.1);
+        altMin = (int) (initialAltitude*-0.1);
     }
     
     public void resetOffAngleRange(){
@@ -52,16 +52,16 @@ public class SimulationAttributes {
                 this.resetAltitudeRange();
                 break;
             case 25:
-                altMax = (int) (this.idealAltitude * 0.15);
+                altMax = (int) (this.initialAltitude * 0.15);
                 break;
             case -25:
-                altMin = (int) (this.idealAltitude * -0.15);
+                altMin = (int) (this.initialAltitude * -0.15);
                 break;
             case 45:
-                altMax = (int) (this.idealAltitude * 0.2);
+                altMax = (int) (this.initialAltitude * 0.2);
                 break;
             case -45:
-                altMin = (int) (this.idealAltitude * -0.2);
+                altMin = (int) (this.initialAltitude * -0.2);
                 break;
             default:
                 this.resetAltitudeRange();

@@ -5,9 +5,9 @@
 package Actuators;
 
 import com.mycompany.rts_assignment.GUI;
+import com.mycompany.rts_assignment.Plane;
 import com.mycompany.rts_assignment.PlaneController;
 import com.mycompany.rts_assignment.SimulationAttributes;
-import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -33,7 +33,9 @@ public class WingsFlap implements Runnable{
     @Override
     public void run() {
         receiveWingsCommand();
+        if(Plane.currentMode != Plane.Mode.closeLanding){
         adjustWingsAngle();
+        }
     }
 
     public void receiveWingsCommand() {

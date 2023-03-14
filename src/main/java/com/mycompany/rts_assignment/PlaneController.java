@@ -12,6 +12,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.Future;
+import java.util.concurrent.Phaser;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,154 +21,201 @@ import java.util.logging.Logger;
  *
  * @author Boey
  */
-public class PlaneController implements Runnable{  
+public class PlaneController implements Runnable {
+
     int alt;
     int angleAdjust; //for wings
     int checkAlt;
-    int offAngle =0;
-    int newSpeed =0;
+    int idealAltitude = SimulationAttributes.initialAltitude;
+    int wheelsTrigger = (int)(idealAltitude*0.2);
+    int offAngle = 0;
+    int newSpeed = 0;
     int idealSpeed = 850; //km/h
-    int cabinPressure =0;
+    int cabinPressure = 0;
     GUI gui;
     ArrayList<SensoryData> commandList = new ArrayList<>();
-    Future<Object> cruisingMode;
-    Observer cabinMask,wheelGear;
-    
-            
-    public PlaneController(GUI gui, Future<Object> logic) {
+    Observer cabinMask, wheelGear;
+    Phaser ph;
+
+    public PlaneController(GUI gui, Phaser p) {
         this.gui = gui;
-        cruisingMode = logic;
+        this.ph = p;
+        ph.register();
     }
 
     @Override
     public void run() {
-    this.receiveValues();
-    if (!cruisingMode.isDone()){    
-       //altitude -------------------------
-       adjustAltitude(alt);
-       //System.out.println("Current altitude: " + alt);
-       gui.taAltitude.append("Current altitude: " + alt +"\n");
-       gui.txtAlt.setText(String.valueOf(alt));
-       
-       //directions/GPS -----------------------------
-       if (offAngle != 0){
-           adjustDirection(offAngle);
-          // System.out.println("Off angle occurs: " + offAngle + " degree away from track.");
-           gui.taGPS.append("Off angle occurs: " + offAngle + " degree away from track."+"\n");
-           gui.txtOA.setText(String.valueOf(offAngle));
-       }       
-       
-       //speed -----------------------------------
-       //System.out.println("Current plane speed:" + newSpeed);
-       gui.txtSpeed.setText(String.valueOf(newSpeed));       
-       adjustSpeed();
-       
-       // Pressure----------------------------------------
-        gui.txtPressure.setText(String.valueOf(cabinPressure));
-        checkPressure();
-        
-       sendCommand();
+        this.receiveValues();
+
+        //Cruusing/close ground Landing mode ~~~~~~~~~~~~~~~~~~~~~~~
+        if (Plane.currentMode != Plane.Mode.Landing) {
+            if(alt < 0){alt =0;}
+            if(newSpeed < 0){newSpeed =0;}
+            processSensorData();            
         }
-    else{
-   //start landing -------------------
-    System.out.println("Plane is going to landing mode.");
-   //while(alt > 300){
-       //angleAdjust = -45;
-       
-   //}
-   
-   // sendCommand();
-   //---------------------------------
-    }
-    }
-    
-    public void adjustAltitude(int current_alt){
-        checkAlt = current_alt - SimulationAttributes.idealAltitude;
-        int idealGap = (int) (SimulationAttributes.idealAltitude * 0.1);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        //start glidiing down for landing -------------------
+        if (Plane.currentMode == Plane.Mode.Landing) {
+            if (alt > (idealAltitude * 0.2) || newSpeed > (idealSpeed * 0.1)) {
+                glidingDown();
+                adjustDirection(offAngle);
+            } else {
+                ph.arrive();
+                
+                idealAltitude =(int)(idealAltitude * 0.2);
+                idealSpeed =(int)(idealSpeed * 0.15);
+            }
+        }
+        //----------------------------------------------
         
+        if (alt == 0 && newSpeed == 0){
+            ph.arriveAndDeregister();
+        }
+        if (alt < wheelsTrigger) {
+            wheelGear.updateObserver();
+        }
+        displayInformation();
+        sendCommand();
+    }
+
+    public void processSensorData() {
+        //altitude -------------------------
+        adjustAltitude(alt);
+
+        //directions/GPS -----------------------------
+        adjustDirection(offAngle);
+
+        //speed -----------------------------------      
+        adjustSpeed();
+
+        // Pressure----------------------------------------
+        checkPressure();
+    }
+
+    public void adjustAltitude(int current_alt) {
+        checkAlt = current_alt - idealAltitude;
+        int idealGap = (int) (idealAltitude * 0.1);
+
         if (checkAlt > idealGap || checkAlt < -idealGap) {//if outside of ideal range
-            if(Math.abs(checkAlt) > idealGap*2){
+            if (Math.abs(checkAlt) > idealGap * 2) {
                 angleAdjust = 45;
-            } else angleAdjust= 25; //if it is really out of track
-            if(checkAlt > 0) angleAdjust = -angleAdjust; // if below ideal altitude, e.g: 900-1000=-100 lower, adjust wing down to glide downwards
+            } else {
+                angleAdjust = 25; //if it is really out of track
+            }
+            if (checkAlt > 0) {
+                angleAdjust = -angleAdjust; // if below ideal altitude, e.g: 900-1000=-100 lower, adjust wing down to glide downwards
+            }
+        } else {
+            angleAdjust = 0;
+        }
+
+        commandList.add(new SensoryData(angleAdjust, "wings"));
+    }
+
+    public void adjustDirection(int offAngle) {
+        if (offAngle != 0) {
+            if (offAngle < 0) {
+                //assuume negative off angle = left
+                angleAdjust = 20;
+            } else {
+                angleAdjust = -20;
+            }
 
         } else {
             angleAdjust = 0;
         }
-   
-        commandList.add(new SensoryData(angleAdjust,"wings"));
-}
-    
-    public void adjustDirection(int offAngle){
-        if (offAngle<0){
-        //assuume negative off angle = left
-        angleAdjust = 20; 
-    }else angleAdjust =-20;
-        
-        commandList.add(new SensoryData(angleAdjust,"tail"));
+        commandList.add(new SensoryData(angleAdjust, "tail"));
     }
-    
-    public void adjustSpeed(){
-        int speedInstruc =0; // 0 do nothing, 1 slow down, 2 = speed up
-        if (newSpeed > (idealSpeed*1.1))speedInstruc = 1;//above ideal speed
-        if (newSpeed < (idealSpeed*1.1))speedInstruc = 2; 
-        
-        commandList.add(new SensoryData(speedInstruc,"engine"));
+
+    public void adjustSpeed() {
+        int speedInstruc = 0; // 0 do nothing, 1 slow down, 2 = speed up
+        if (newSpeed > (idealSpeed * 1.1)) {
+            speedInstruc = 1;//above ideal speed
+        }
+        if (newSpeed < (idealSpeed * 1.1)) {
+            speedInstruc = 2;
+        }
+
+        commandList.add(new SensoryData(speedInstruc, "engine"));
     }
-     
-    public void checkPressure(){       
-        if (cabinPressure >= 100){
-            gui.taAlerts.append("!!!Cabin pressure is at abnormal level: " +cabinPressure+ "!!!\n");
+
+    public void checkPressure() {
+        if (cabinPressure >= 100) {
+            gui.taAlerts.append("!!!Cabin pressure is at abnormal level: " + cabinPressure + "!!!\n");
             cabinMask.updateObserver();
         }
     }
-    
-    public void receiveValues(){
+
+    public void displayInformation() { //to panel
+        //altitude 
+        //System.out.println("Current altitude: " + alt);
+        gui.taAltitude.append("Current altitude: " + alt + "\n");
+        gui.txtAlt.setText(String.valueOf(alt));
+
+        //GPS
+        // System.out.println("Off angle occurs: " + offAngle + " degree away from track.");
+        gui.taGPS.append("Off angle occurs: " + offAngle + " degree away from track." + "\n");
+        gui.txtOA.setText(String.valueOf(offAngle));
+
+        //speed
+        //System.out.println("Current plane speed:" + newSpeed);
+        gui.txtSpeed.setText(String.valueOf(newSpeed));
+
+        //pressure
+        gui.txtPressure.setText(String.valueOf(cabinPressure));
+    }
+
+    public void receiveValues() {
         try {
             String queueName1 = "altitude";
             String queueName2 = "gps";
             String queueName3 = "speed";
             String queueName4 = "pressure";
-            
+
             ConnectionFactory cf = new ConnectionFactory();
             Connection con = cf.newConnection();
             Channel chan = con.createChannel();
-            
-            chan.queueDeclare(queueName1,false,false,false,null);
-            chan.queueDeclare(queueName2,false,false,false,null);
-            chan.queueDeclare(queueName3,false,false,false,null);
-            chan.queueDeclare(queueName4,false,false,false,null);
-            
+
+            chan.queueDeclare(queueName1, false, false, false, null);
+            chan.queueDeclare(queueName2, false, false, false, null);
+            chan.queueDeclare(queueName3, false, false, false, null);
+            chan.queueDeclare(queueName4, false, false, false, null);
+
             //altitude
-            chan.basicConsume(queueName1,(x,msg)->{
-                String m = new String(msg.getBody(),"UTF-8");
+            chan.basicConsume(queueName1, (x, msg) -> {
+                String m = new String(msg.getBody(), "UTF-8");
                 alt = Integer.parseInt(m);
-            }, x->{});
-            
+            }, x -> {
+            });
+
             //gps
-            chan.basicConsume(queueName2,(x,msg)->{
-                String m = new String(msg.getBody(),"UTF-8");
+            chan.basicConsume(queueName2, (x, msg) -> {
+                String m = new String(msg.getBody(), "UTF-8");
                 offAngle = Integer.parseInt(m);
-            }, x->{});
-            
+            }, x -> {
+            });
+
             //speed
-            chan.basicConsume(queueName3,(x,msg)->{
-                String m = new String(msg.getBody(),"UTF-8");
+            chan.basicConsume(queueName3, (x, msg) -> {
+                String m = new String(msg.getBody(), "UTF-8");
                 newSpeed = Integer.parseInt(m);
-            }, x->{});
-            
+            }, x -> {
+            });
+
             //pressure
-            chan.basicConsume(queueName4,(x,msg)->{
-                String m = new String(msg.getBody(),"UTF-8");
+            chan.basicConsume(queueName4, (x, msg) -> {
+                String m = new String(msg.getBody(), "UTF-8");
                 cabinPressure = Integer.parseInt(m);
-            }, x->{});
-           
+            }, x -> {
+            });
+
         } catch (IOException | TimeoutException ex) {
             Logger.getLogger(PlaneController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
-    
+
     public void sendCommand() {
         commandList.parallelStream().forEach(element -> {
             processCommand(element);
@@ -188,13 +236,30 @@ public class PlaneController implements Runnable{
             Logger.getLogger(PlaneController.class.getName()).log(Level.SEVERE, null, ex1);
         }
     }
-    
-    public void addObserver(Observer o, boolean cabinmask){
-        if (cabinmask) {
-            this.cabinMask = o;
-        } else {
-            this.wheelGear = o;
+
+    public void addObserver(Observer o, int type) {
+        switch (type) {
+            case 1:
+                this.cabinMask = o;
+                break;
+            case 2:
+                this.wheelGear = o;
+                break;
         }
     }
-}
 
+    public void glidingDown() {
+        if (alt > 200) {
+            angleAdjust = -45;
+        } else {
+            angleAdjust = 0;
+        }
+
+        int engineInstr = 2;
+        if (newSpeed > 80) {
+            engineInstr = 3;
+        }
+        commandList.add(new SensoryData(angleAdjust, "wings"));
+        commandList.add(new SensoryData(engineInstr, "engine"));
+    }
+}
