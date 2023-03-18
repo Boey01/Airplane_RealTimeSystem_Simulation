@@ -5,7 +5,7 @@
 package com.mycompany.rts_assignment;
 
 import Observers.Observer;
-import Sensories.SensoryData;
+import Sensors.SensoryData;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;

@@ -4,7 +4,7 @@
  */
 package Observers;
 
-import Sensories.SensoryData;
+import Sensors.SensoryData;
 import com.mycompany.rts_assignment.*;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;

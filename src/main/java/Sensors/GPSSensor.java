@@ -2,16 +2,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package Sensories;
+package Sensors;
 
-import Observers.Observer;
-import com.mycompany.rts_assignment.Plane;
 import com.mycompany.rts_assignment.SimulationAttributes;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import java.io.IOException;
-import java.util.Random;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,50 +17,37 @@ import java.util.logging.Logger;
  *
  * @author Boey
  */
-public class SpeedSensor implements Runnable{
+public class GPSSensor implements Runnable{
     SimulationAttributes simulation;
-    Observer pressureObserver;
-    int speed;
-    Random rand = new Random();
     
-    public SpeedSensor(SimulationAttributes s) {
-        this.simulation = s;
+    int offAngle=0;
+
+    public GPSSensor(SimulationAttributes sa){
+        this.simulation = sa;
+    }
+    
+     public void changeInOA() {
+        offAngle += simulation.giveRandomOA();    
     }
 
     @Override
     public void run() {
-        if(Plane.currentMode != Plane.Mode.closeLanding) {
-        changeInSpeed();
-        }
-        else{
-            simulation.planespeed -= 10;
-        }
-        
-        sendNewSpeed(simulation.planespeed);
-        notifyPressureObserver();
-        
+        changeInOA();
+        sendGPSValue(offAngle);
     }
-    
-    public void changeInSpeed(){
-        speed = rand.nextInt(10);
-        if(rand.nextBoolean())speed = -speed;  
-        
-        simulation.planespeed += speed;
-    }
-    
-    public void sendNewSpeed(int speed){
-       String queueName = "speed";
+
+    public void sendGPSValue(int offAngle){
+       String queueName = "gps";
        try {          
             ConnectionFactory cf = new ConnectionFactory();
             Connection con = cf.newConnection();
             Channel chan = con.createChannel();
             
             //convert message
-            String msg = Integer.toString(speed);
+            String msg = Integer.toString(offAngle);
                        
             chan.queueDeclare(queueName,false,false,false,null);
-            
-            
+                        
             chan.basicPublish("", queueName, null, msg.getBytes());
             chan.close();
             con.close();
@@ -71,14 +55,5 @@ public class SpeedSensor implements Runnable{
             Logger.getLogger(AltitudeSensor.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public void addPressureObserver(Observer ps) {
-        this.pressureObserver = ps;
-    }
-        
-    public void notifyPressureObserver(){
-        if(pressureObserver!=null){
-            pressureObserver.updateObserver(new SensoryData(simulation.planespeed,"speed"));
-        }
-    }
+      
 }

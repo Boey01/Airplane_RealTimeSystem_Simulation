@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Project/Maven2/JavaApp/src/main/java/${packagePath}/${mainClassName}.java to edit this template
  */
 
-package Sensories;
+package Sensors;
 
 import Observers.Observer;
 import com.mycompany.rts_assignment.Plane;

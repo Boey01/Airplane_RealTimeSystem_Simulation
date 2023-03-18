@@ -4,7 +4,7 @@
  */
 package com.mycompany.rts_assignment;
 
-import Sensories.AltitudeSensor;
+import Sensors.AltitudeSensor;
 import java.awt.Rectangle;
 import java.util.logging.Level;
 import java.util.logging.Logger;

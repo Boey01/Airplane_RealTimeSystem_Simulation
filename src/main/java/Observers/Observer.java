@@ -4,7 +4,7 @@
  */
 package Observers;
 
-import Sensories.SensoryData;
+import Sensors.SensoryData;
 
 /**
  *

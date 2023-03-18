@@ -4,7 +4,7 @@
  */
 package Observers;
 
-import Sensories.SensoryData;
+import Sensors.SensoryData;
 import com.mycompany.rts_assignment.GUI;
 
 /**
