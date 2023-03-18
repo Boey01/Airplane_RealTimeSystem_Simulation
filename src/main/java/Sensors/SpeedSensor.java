@@ -4,6 +4,7 @@
  */
 package Sensors;
 
+import com.mycompany.rts_assignment.Data;
 import Observers.Observer;
 import com.mycompany.rts_assignment.Plane;
 import com.mycompany.rts_assignment.SimulationAttributes;
@@ -78,7 +79,7 @@ public class SpeedSensor implements Runnable{
         
     public void notifyPressureObserver(){
         if(pressureObserver!=null){
-            pressureObserver.updateObserver(new SensoryData(simulation.planespeed,"speed"));
+            pressureObserver.updateObserver(new Data(simulation.planespeed,"speed"));
         }
     }
 }

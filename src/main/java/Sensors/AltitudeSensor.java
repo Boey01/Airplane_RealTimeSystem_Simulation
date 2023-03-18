@@ -5,6 +5,7 @@
 
 package Sensors;
 
+import com.mycompany.rts_assignment.Data;
 import Observers.Observer;
 import com.mycompany.rts_assignment.Plane;
 import com.mycompany.rts_assignment.SimulationAttributes;
@@ -72,7 +73,7 @@ public class AltitudeSensor implements Runnable{
         
     public void notifyPressureObserver(){
         if(pressureObserver!=null){
-            pressureObserver.updateObserver(new SensoryData(altitude,"altitude"));
+            pressureObserver.updateObserver(new Data(altitude,"altitude"));
         }
     }
 }

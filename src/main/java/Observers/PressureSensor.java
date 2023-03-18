@@ -4,7 +4,7 @@
  */
 package Observers;
 
-import Sensors.SensoryData;
+import com.mycompany.rts_assignment.Data;
 import com.mycompany.rts_assignment.*;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -22,7 +22,7 @@ public class PressureSensor implements Observer{
     int pressure,altitude,speed;
     int temperature = 25;
     GUI gui;
-    SensoryData sd;
+    Data sd;
 
     public PressureSensor(GUI gui) {
         this.gui = gui;
@@ -34,7 +34,7 @@ public class PressureSensor implements Observer{
     }
 
      @Override
-    public void updateObserver(SensoryData data) {
+    public void updateObserver(Data data) {
         sd = data;
         if(sd.routingKey == "altitude"){
             altitudeChanged(sd.data);

@@ -4,7 +4,7 @@
  */
 package Observers;
 
-import Sensors.SensoryData;
+import com.mycompany.rts_assignment.Data;
 
 /**
  *
@@ -12,5 +12,5 @@ import Sensors.SensoryData;
  */
 public interface Observer {
     public void updateObserver();
-    public void updateObserver(SensoryData data);
+    public void updateObserver(Data data);
 }

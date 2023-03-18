@@ -5,7 +5,6 @@
 package com.mycompany.rts_assignment;
 
 import Observers.Observer;
-import Sensors.SensoryData;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -33,7 +32,7 @@ public class PlaneController implements Runnable {
     int idealSpeed = 850; //km/h
     int cabinPressure = 0;
     GUI gui;
-    ArrayList<SensoryData> commandList = new ArrayList<>();
+    ArrayList<Data> commandList = new ArrayList<>();
     Observer cabinMask, wheelGear;
     Phaser ph;
 
@@ -110,7 +109,7 @@ public class PlaneController implements Runnable {
             angleAdjust = 0;
         }
 
-        commandList.add(new SensoryData(angleAdjust, "wings"));
+        commandList.add(new Data(angleAdjust, "wings"));
     }
 
     public void adjustDirection(int offAngle) {
@@ -125,7 +124,7 @@ public class PlaneController implements Runnable {
         } else {
             angleAdjust = 0;
         }
-        commandList.add(new SensoryData(angleAdjust, "tail"));
+        commandList.add(new Data(angleAdjust, "tail"));
     }
 
     public void adjustSpeed() {
@@ -137,7 +136,7 @@ public class PlaneController implements Runnable {
             speedInstruc = 2;
         }
 
-        commandList.add(new SensoryData(speedInstruc, "engine"));
+        commandList.add(new Data(speedInstruc, "engine"));
     }
 
     public void checkPressure() {
@@ -213,7 +212,6 @@ public class PlaneController implements Runnable {
         } catch (IOException | TimeoutException ex) {
             Logger.getLogger(PlaneController.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }
 
     public void sendCommand() {
@@ -223,7 +221,7 @@ public class PlaneController implements Runnable {
         commandList.clear();
     }
 
-    public static void processCommand(SensoryData i) {
+    public static void processCommand(Data i) {
         String ex = "CommandExchange";
         ConnectionFactory f = new ConnectionFactory();
 
@@ -259,7 +257,7 @@ public class PlaneController implements Runnable {
         if (newSpeed > 80) {
             engineInstr = 3;
         }
-        commandList.add(new SensoryData(angleAdjust, "wings"));
-        commandList.add(new SensoryData(engineInstr, "engine"));
+        commandList.add(new Data(angleAdjust, "wings"));
+        commandList.add(new Data(engineInstr, "engine"));
     }
 }

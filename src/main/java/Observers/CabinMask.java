@@ -4,7 +4,7 @@
  */
 package Observers;
 
-import Sensors.SensoryData;
+import com.mycompany.rts_assignment.Data;
 import com.mycompany.rts_assignment.GUI;
 
 /**
@@ -27,7 +27,7 @@ public class CabinMask implements Observer{
     }
     
     @Override
-    public void updateObserver(SensoryData data) {  
+    public void updateObserver(Data data) {  
     }
     
 }
