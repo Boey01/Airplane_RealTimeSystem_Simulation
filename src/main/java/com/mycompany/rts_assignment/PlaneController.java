@@ -250,7 +250,7 @@ public class PlaneController implements Runnable {
 
     public void glidingDown() {
         if (alt > 200) {
-            angleAdjust = -45;
+            angleAdjust = -25;
         } else {
             angleAdjust = 0;
         }
