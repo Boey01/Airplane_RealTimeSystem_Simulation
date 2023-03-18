@@ -228,7 +228,7 @@ AltitudeSensor as;
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCabinPressureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCabinPressureActionPerformed
-      as.altitude += 500;
+      as.altitude += 800;
     }//GEN-LAST:event_btnCabinPressureActionPerformed
 
     /**
