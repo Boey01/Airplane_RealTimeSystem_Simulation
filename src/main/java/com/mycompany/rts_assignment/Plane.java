@@ -80,7 +80,6 @@ public class Plane {
         es.shutdown();
         currentMode = Mode.Landed;
         gui.taAlerts.append("Airplane is now landed.\n");
-        p.arriveAndAwaitAdvance(); 
         
     }
     
