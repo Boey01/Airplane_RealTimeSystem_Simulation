@@ -195,33 +195,37 @@ public class PlaneController implements Runnable {
 
     public void receiveValues() {
         try {
-            //altitude
+            //altitude        
             chanReceive.basicConsume(queueName1, (x, msg) -> {
                 String m = new String(msg.getBody(), "UTF-8");
                 alt = Integer.parseInt(m);
             }, x -> {
             });
-
+            chanReceive.queuePurge(queueName1);
+            
             //gps
             chanReceive.basicConsume(queueName2, (x, msg) -> {
                 String m = new String(msg.getBody(), "UTF-8");
                 offAngle = Integer.parseInt(m);
             }, x -> {
             });
-
+            chanReceive.queuePurge(queueName2);
+            
             //speed
             chanReceive.basicConsume(queueName3, (x, msg) -> {
                 String m = new String(msg.getBody(), "UTF-8");
                 newSpeed = Integer.parseInt(m);
             }, x -> {
             });
-
+            chanReceive.queuePurge(queueName3);
+            
             //pressure
             chanReceive.basicConsume(queueName4, (x, msg) -> {
                 String m = new String(msg.getBody(), "UTF-8");
                 cabinPressure = Integer.parseInt(m);
             }, x -> {
             });
+            chanReceive.queuePurge(queueName4);
 
         } catch (IOException ex) {
             Logger.getLogger(PlaneController.class.getName()).log(Level.SEVERE, null, ex);

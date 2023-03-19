@@ -73,6 +73,7 @@ public class WingsFlap implements Runnable{
             }, x -> {
             });
 
+            chan.queuePurge(queueName);
         } catch (IOException ex) {
             Logger.getLogger(PlaneController.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -69,7 +69,7 @@ public class Tail implements Runnable{
                 angle = Integer.parseInt(m);
             }, x -> {
             });
-
+            chan.queuePurge(queueName);
         } catch (IOException ex) {
             Logger.getLogger(PlaneController.class.getName()).log(Level.SEVERE, null, ex);
         }

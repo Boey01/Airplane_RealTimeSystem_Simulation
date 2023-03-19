@@ -80,7 +80,7 @@ public class Engine implements Runnable {
                 engineInstruction = Integer.parseInt(m);
             }, x -> {
             });
-
+            chan.queuePurge(queueName);
         } catch (IOException ex) {
             Logger.getLogger(PlaneController.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -57,7 +57,7 @@ public class AltitudeSensor implements Runnable{
             String msg = Integer.toString(alt);
                        
             chan.queueDeclare(queueName,false,false,false,null);
-            
+
             chan.basicPublish("", queueName, null, msg.getBytes());
             chan.close();
             con.close();
