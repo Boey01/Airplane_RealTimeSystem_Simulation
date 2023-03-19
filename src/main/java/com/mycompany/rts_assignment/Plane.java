@@ -49,7 +49,7 @@ public class Plane {
         gui.setVisible(true);
         gui.importAltitudeSensor(as); 
         
-        ScheduledExecutorService es = Executors.newScheduledThreadPool(1);
+        ScheduledExecutorService es = Executors.newScheduledThreadPool(7);
         p.register();
               
         es.scheduleAtFixedRate(as, 0, SimulationAttributes.getSpeed(), TimeUnit.MILLISECONDS);
@@ -70,11 +70,11 @@ public class Plane {
         
         p.arriveAndAwaitAdvance(); 
         currentMode = Mode.Landed;
-        es.shutdown();     
+         
         gui.taAlerts.append("Airplane is now landed.\n");
         
-        gui.dispose();
-        
+        Thread.sleep(1000);
+        es.shutdown();
     }
     
     
@@ -89,6 +89,7 @@ public class Plane {
     
     public Object call() throws Exception {
     while (Plane.currentMode == Plane.Mode.Cruising) {
+        Thread.sleep(100);
         gui.btnLanding.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Plane.currentMode = Plane.Mode.Landing;            

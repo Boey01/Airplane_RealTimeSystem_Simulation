@@ -98,7 +98,6 @@ public class PlaneController implements Runnable {
             try {
                 conReceive.close();
                 chanReceive.close();
-                System.out.println("closing connectiong");
             } catch (IOException | TimeoutException ex) {
                 Logger.getLogger(Engine.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -238,10 +237,10 @@ public class PlaneController implements Runnable {
 
     public static void processCommand(Data i) {
         String ex = "CommandExchange";
-        ConnectionFactory f = new ConnectionFactory();
+        ConnectionFactory cf = new ConnectionFactory();
 
         try {
-            Connection con = f.newConnection();
+            Connection con = cf.newConnection();
             Channel ch = con.createChannel();
             ch.exchangeDeclare(ex, "direct");
 
