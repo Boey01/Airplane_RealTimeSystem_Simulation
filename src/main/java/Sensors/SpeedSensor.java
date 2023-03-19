@@ -4,13 +4,13 @@
  */
 package Sensors;
 
-import com.mycompany.rts_assignment.Data;
-import com.mycompany.rts_assignment.Data;
+import Main.Data;
+import Main.Data;
 import Observers.Observer;
-import com.mycompany.rts_assignment.Plane;
-import com.mycompany.rts_assignment.Plane;
-import com.mycompany.rts_assignment.SimulationAttributes;
-import com.mycompany.rts_assignment.SimulationAttributes;
+import Main.Plane;
+import Main.Plane;
+import Main.SimulationAttributes;
+import Main.SimulationAttributes;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;

@@ -4,8 +4,8 @@
  */
 package Sensors;
 
-import com.mycompany.rts_assignment.SimulationAttributes;
-import com.mycompany.rts_assignment.SimulationAttributes;
+import Main.SimulationAttributes;
+import Main.SimulationAttributes;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;

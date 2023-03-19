@@ -4,8 +4,8 @@
  */
 package Observers;
 
-import com.mycompany.rts_assignment.Data;
-import com.mycompany.rts_assignment.Data;
+import Main.Data;
+import Main.Data;
 
 /**
  *

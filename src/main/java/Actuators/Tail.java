@@ -4,13 +4,13 @@
  */
 package Actuators;
 
-import com.mycompany.rts_assignment.GUI;
-import com.mycompany.rts_assignment.GUI;
-import com.mycompany.rts_assignment.Plane;
-import com.mycompany.rts_assignment.PlaneController;
-import com.mycompany.rts_assignment.PlaneController;
-import com.mycompany.rts_assignment.SimulationAttributes;
-import com.mycompany.rts_assignment.SimulationAttributes;
+import Main.GUI;
+import Main.GUI;
+import Main.Plane;
+import Main.PlaneController;
+import Main.PlaneController;
+import Main.SimulationAttributes;
+import Main.SimulationAttributes;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;

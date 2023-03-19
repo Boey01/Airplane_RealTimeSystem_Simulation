@@ -4,10 +4,9 @@
  */
 package Observers;
 
-import com.mycompany.rts_assignment.Data;
-import com.mycompany.rts_assignment.*;
-import com.mycompany.rts_assignment.Data;
-import com.mycompany.rts_assignment.GUI;
+import Main.Data;
+import Main.Data;
+import Main.GUI;
 import Observers.Observer;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
