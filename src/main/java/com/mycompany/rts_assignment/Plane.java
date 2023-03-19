@@ -4,14 +4,6 @@
  */
 package com.mycompany.rts_assignment;
 
-import Actuators.Tail;
-import Actuators.WingsFlap;
-import Actuators.Engine;
-import Observers.CabinMask;
-import Sensors.GPSSensor;
-import Sensors.AltitudeSensor;
-import Sensors.SpeedSensor;
-import Observers.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -77,9 +69,11 @@ public class Plane {
         gui.taAlerts.append("Airplane is proceeding to final landing procedures.\n");
         
         p.arriveAndAwaitAdvance(); 
-        es.shutdown();
         currentMode = Mode.Landed;
+        es.shutdown();     
         gui.taAlerts.append("Airplane is now landed.\n");
+        
+        gui.dispose();
         
     }
     
@@ -97,8 +91,7 @@ public class Plane {
     while (Plane.currentMode == Plane.Mode.Cruising) {
         gui.btnLanding.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Plane.currentMode = Plane.Mode.Landing;
-                
+                Plane.currentMode = Plane.Mode.Landing;            
             }
         });
     }

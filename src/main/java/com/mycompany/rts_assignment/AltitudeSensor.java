@@ -3,10 +3,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Project/Maven2/JavaApp/src/main/java/${packagePath}/${mainClassName}.java to edit this template
  */
 
-package Sensors;
+package com.mycompany.rts_assignment;
 
 import com.mycompany.rts_assignment.Data;
-import Observers.Observer;
 import com.mycompany.rts_assignment.Plane;
 import com.mycompany.rts_assignment.SimulationAttributes;
 import com.rabbitmq.client.Channel;

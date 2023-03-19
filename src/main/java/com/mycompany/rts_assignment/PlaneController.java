@@ -4,7 +4,6 @@
  */
 package com.mycompany.rts_assignment;
 
-import Observers.Observer;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -36,10 +35,30 @@ public class PlaneController implements Runnable {
     Observer cabinMask, wheelGear;
     Phaser ph;
 
+    ConnectionFactory cfReceive;
+    Connection conReceive;
+    Channel chanReceive;
+    String queueName1 = "altitude";
+    String queueName2 = "gps";
+    String queueName3 = "speed";
+    String queueName4 = "pressure";
+            
     public PlaneController(GUI gui, Phaser p) {
-        this.gui = gui;
-        this.ph = p;
-        ph.register();
+        try {
+            this.gui = gui;
+            this.ph = p;
+            ph.register();
+            this.cfReceive = new ConnectionFactory();
+            this.conReceive = cfReceive.newConnection();
+            this.chanReceive = conReceive.createChannel();
+            
+            chanReceive.queueDeclare(queueName1, false, false, false, null);
+            chanReceive.queueDeclare(queueName2, false, false, false, null);
+            chanReceive.queueDeclare(queueName3, false, false, false, null);
+            chanReceive.queueDeclare(queueName4, false, false, false, null);
+        } catch (IOException | TimeoutException ex) {
+            Logger.getLogger(PlaneController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
@@ -73,6 +92,16 @@ public class PlaneController implements Runnable {
         }
         if (alt < wheelsTrigger) {
             wheelGear.updateObserver();
+        }
+        
+        if(Plane.currentMode == Plane.Mode.Landed){
+            try {
+                conReceive.close();
+                chanReceive.close();
+                System.out.println("closing connectiong");
+            } catch (IOException | TimeoutException ex) {
+                Logger.getLogger(Engine.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         displayInformation();
         sendCommand();
@@ -167,49 +196,35 @@ public class PlaneController implements Runnable {
 
     public void receiveValues() {
         try {
-            String queueName1 = "altitude";
-            String queueName2 = "gps";
-            String queueName3 = "speed";
-            String queueName4 = "pressure";
-
-            ConnectionFactory cf = new ConnectionFactory();
-            Connection con = cf.newConnection();
-            Channel chan = con.createChannel();
-
-            chan.queueDeclare(queueName1, false, false, false, null);
-            chan.queueDeclare(queueName2, false, false, false, null);
-            chan.queueDeclare(queueName3, false, false, false, null);
-            chan.queueDeclare(queueName4, false, false, false, null);
-
             //altitude
-            chan.basicConsume(queueName1, (x, msg) -> {
+            chanReceive.basicConsume(queueName1, (x, msg) -> {
                 String m = new String(msg.getBody(), "UTF-8");
                 alt = Integer.parseInt(m);
             }, x -> {
             });
 
             //gps
-            chan.basicConsume(queueName2, (x, msg) -> {
+            chanReceive.basicConsume(queueName2, (x, msg) -> {
                 String m = new String(msg.getBody(), "UTF-8");
                 offAngle = Integer.parseInt(m);
             }, x -> {
             });
 
             //speed
-            chan.basicConsume(queueName3, (x, msg) -> {
+            chanReceive.basicConsume(queueName3, (x, msg) -> {
                 String m = new String(msg.getBody(), "UTF-8");
                 newSpeed = Integer.parseInt(m);
             }, x -> {
             });
 
             //pressure
-            chan.basicConsume(queueName4, (x, msg) -> {
+            chanReceive.basicConsume(queueName4, (x, msg) -> {
                 String m = new String(msg.getBody(), "UTF-8");
                 cabinPressure = Integer.parseInt(m);
             }, x -> {
             });
 
-        } catch (IOException | TimeoutException ex) {
+        } catch (IOException ex) {
             Logger.getLogger(PlaneController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -225,11 +240,15 @@ public class PlaneController implements Runnable {
         String ex = "CommandExchange";
         ConnectionFactory f = new ConnectionFactory();
 
-        try (Connection con = f.newConnection()) {
+        try {
+            Connection con = f.newConnection();
             Channel ch = con.createChannel();
             ch.exchangeDeclare(ex, "direct");
 
             ch.basicPublish(ex, i.routingKey, null, String.valueOf(i.data).getBytes());
+            
+            ch.close();
+            con.close();
         } catch (IOException | TimeoutException ex1) {
             Logger.getLogger(PlaneController.class.getName()).log(Level.SEVERE, null, ex1);
         }
