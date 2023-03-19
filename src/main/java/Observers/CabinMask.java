@@ -2,34 +2,34 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.mycompany.rts_assignment;
+package Observers;
 
 import com.mycompany.rts_assignment.Data;
+import com.mycompany.rts_assignment.Data;
+import com.mycompany.rts_assignment.GUI;
 import com.mycompany.rts_assignment.GUI;
 
 /**
  *
  * @author Boey
  */
-public class WheelGear implements Observer {
-
-    boolean open = false;
+public class CabinMask implements Observer{
+    int cabinMaskCount = 1;
     GUI gui;
-
-    public WheelGear(GUI gui) {
+    public CabinMask(GUI gui) {
         this.gui = gui;
     }
-
+   
     @Override
     public void updateObserver() {
-         if (!open) {
-            gui.taAlerts.append("Airplane wheels are opened. \n");
-            open = true;
-        }
+      if (cabinMaskCount > 0){
+          gui.taAlerts.append("!!!Realeasing Cabin Mask!!!\n");
+          cabinMaskCount --;
+      }
     }
-
+    
     @Override
-    public void updateObserver(Data data){       
+    public void updateObserver(Data data) {  
     }
-
+    
 }

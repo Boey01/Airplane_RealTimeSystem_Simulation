@@ -2,10 +2,14 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.mycompany.rts_assignment;
+package Sensors;
 
 import com.mycompany.rts_assignment.Data;
+import com.mycompany.rts_assignment.Data;
+import Observers.Observer;
 import com.mycompany.rts_assignment.Plane;
+import com.mycompany.rts_assignment.Plane;
+import com.mycompany.rts_assignment.SimulationAttributes;
 import com.mycompany.rts_assignment.SimulationAttributes;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
